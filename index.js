@@ -121,9 +121,11 @@ client.on("interactionCreate", async interaction => {
 
     await interaction.reply({
       content:
+        `🪙 **LANZAMIENTO DE MONEDA**\n` +
+        `Resultado: **${coin}**\n\n` +
         `🎲 **POOL GENERADO**\n` +
         pool.map(k => `• ${k}`).join("\n") +
-        `\n\n🪙 Empieza <@${starter}>`,
+        `\n\n👉 Empieza <@${starter}>`,
       components: createButtons(pool, "pick")
     });
   }

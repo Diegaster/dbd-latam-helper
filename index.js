@@ -105,7 +105,8 @@ client.on("interactionCreate", async interaction => {
       ...pickRandom(lists.tier5, 2)
     ];
 
-    const starter = Math.random() < 0.5 ? p1 : p2;
+   const coin = Math.random() < 0.5 ? "CARA" : "CRUZ";
+   const starter = coin === "CARA" ? p1 : p2;
 
     games.set(interaction.channelId, {
       pool,

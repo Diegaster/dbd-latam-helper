@@ -24,8 +24,8 @@ const games = new Map();
 ===================== */
 const lists = {
   tier1: ["Nurse","Blight","Hillbilly","Ghoul","Krasue","Singularity","Spirit"],
-  tier2: ["Twins","Dark-Lord","Oni","Huntress","Artist","Mastermind","Cenobite"],
-  tier3: ["Plague","Doctor","Clown","Nightmare","Executioner","Xenomorph","Unknown","Good-Guy","Lich","Houndmaster"],
+  tier2: ["Twins","Dark Lord","Oni","Huntress","Artist","Mastermind","Cenobite"],
+  tier3: ["Plague","Doctor","Clown","Nightmare","Executioner","Xenomorph","Unknown","Good Guy","Lich","Houndmaster"],
   tier4: ["Wraith","Deathslinger","Animatronic","Demogorgon","Dredge","Onryo"],
   tier5: ["Trickster","Legion","Cannibal","Hag","Pig","GhostFace","Trapper"]
 };

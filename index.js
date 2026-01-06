@@ -324,7 +324,7 @@ async function generateInfoKillerImage(killer) {
   ctx.drawImage(img, x, y, portraitSize, portraitSize);
   ctx.strokeStyle = "#000000";
   ctx.lineWidth = 6;
-  ctx.strokeRect(x - 3, y - 3, size + 6, size + 6);
+  ctx.strokeRect(x - 3, y - 3, portraitSize + 6, portraitSize + 6);
   return canvas.toBuffer("image/png");
 }
 
@@ -337,26 +337,26 @@ client.on("interactionCreate", async interaction => {
 
   /* AUTOCOMPLETE */
   if (interaction.isAutocomplete()) {
-    if (interaction.commandName === "info-killer") {
-      const key = interaction.options.getString("killer");
-      const killer = killersData[key];
-      if (!killer) {
-        return interaction.reply({ content: "❌ Killer no encontrado.", ephemeral: true });
-      }
-    
-      await interaction.deferReply();
-    
-      const buffer = await generateInfoKillerImage(killer);
-    
-      const embed = new EmbedBuilder()
-        .setColor(0x5865F2)
-        .setImage("attachment://killer.png");
-    
-      return interaction.editReply({
-        embeds: [embed],
-        files: [{ attachment: buffer, name: "killer.png" }]
-      });
-    }
+    if (interaction.commandName !== "info-killer") return;
+  
+    const focused = interaction.options.getFocused().toLowerCase();
+  
+    const choices = Object.entries(killersData)
+      .filter(([key, data]) =>
+        key.toLowerCase().includes(focused) ||
+        data.display.toLowerCase().includes(focused) ||
+        data.aliases.some(a => a.toLowerCase().includes(focused))
+      )
+      .slice(0, 25)
+      .map(([key, data]) => ({
+        name: data.display,
+        value: key
+      }));
+  
+    await interaction.respond(choices);
+    return;
+  }
+
 
 
   if (interaction.isChatInputCommand()) {

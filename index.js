@@ -171,7 +171,7 @@ async function generateTierListImage() {
     /* =====================
        FONDO DE FILA
     ===================== */
-    ctx.fillStyle = #000000;
+    ctx.fillStyle = "#000000";
     ctx.fillRect(0, y - 6, width, rowHeight);
 
     /* Barra de color del tier */

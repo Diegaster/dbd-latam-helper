@@ -335,19 +335,27 @@ client.on("interactionCreate", async interaction => {
 
   /* AUTOCOMPLETE */
   if (interaction.isAutocomplete()) {
-    if (interaction.commandName !== "info-killer") return;
-    const focused = interaction.options.getFocused().toLowerCase();
-    const choices = Object.entries(killersData)
-      .filter(([k, d]) =>
-        k.toLowerCase().includes(focused) ||
-        d.display.toLowerCase().includes(focused) ||
-        d.aliases.some(a => a.toLowerCase().includes(focused))
-      )
-      .slice(0, 25)
-      .map(([k, d]) => ({ name: d.display, value: k }));
-    await interaction.respond(choices);
-    return;
-  }
+    if (interaction.commandName === "info-killer") {
+      const key = interaction.options.getString("killer");
+      const killer = killersData[key];
+      if (!killer) {
+        return interaction.reply({ content: "❌ Killer no encontrado.", ephemeral: true });
+      }
+    
+      await interaction.deferReply();
+    
+      const buffer = await generateInfoKillerImage(killer);
+    
+      const embed = new EmbedBuilder()
+        .setColor(0x5865F2)
+        .setImage("attachment://killer.png");
+    
+      return interaction.editReply({
+        embeds: [embed],
+        files: [{ attachment: buffer, name: "killer.png" }]
+      });
+    }
+
 
   if (interaction.isChatInputCommand()) {
     if (interaction.commandName === "tier-list") {

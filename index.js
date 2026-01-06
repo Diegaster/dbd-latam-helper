@@ -134,7 +134,7 @@ function buildPickBanEmbed(game, player, action, coin = null) {
   return embed;
 }
 async function generateTierListImage(selectedTier = "full") {
-  const iconSize = 112;
+  const iconSize = 120;
   const padding = 16;
   const rowHeight = iconSize + 20;
   const width = 1500;
@@ -386,12 +386,16 @@ client.on("interactionCreate", async interaction => {
     if (interaction.commandName === "tier-list") {
       await interaction.deferReply();
     
-      const buffer = await generateTierListImage();
+      const selectedTier =
+        interaction.options.getString("tier") ?? "full";
+    
+      const buffer = await generateTierListImage(selectedTier);
     
       return interaction.editReply({
         files: [{ attachment: buffer, name: "tierlist.png" }]
       });
     }
+
     /* INFO KILLER */
     if (interaction.commandName === "info-killer") {
       const key = interaction.options.getString("killer");

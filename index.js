@@ -133,20 +133,23 @@ function buildPickBanEmbed(game, player, action, coin = null) {
   if (coin) embed.setDescription(`🪙 **Lanzamiento de moneda:** ${coin}`);
   return embed;
 }
-async function generateTierListImage() {
+async function generateTierListImage(selectedTier = "full") {
   const iconSize = 112;
   const padding = 16;
   const rowHeight = iconSize + 20;
   const width = 1500;
 
-  const tiers = [
-    { label: "Tier 1", killers: lists.tier1 },
-    { label: "Tier 2", killers: lists.tier2 },
-    { label: "Tier 3", killers: lists.tier3 },
-    { label: "Tier 4", killers: lists.tier4 },
-    { label: "Tier 5", killers: lists.tier5 },
-    { label: "Deshab.", killers: lists.deshabilitado }
+  const ALL_TIERS = [
+    { label: "Tier 1", key: "tier1", killers: lists.tier1 },
+    { label: "Tier 2", key: "tier2", killers: lists.tier2 },
+    { label: "Tier 3", key: "tier3", killers: lists.tier3 },
+    { label: "Tier 4", key: "tier4", killers: lists.tier4 },
+    { label: "Tier 5", key: "tier5", killers: lists.tier5 },
+    { label: "Deshab.", key: "deshabilitado", killers: lists.deshabilitado }
   ];
+  const tiers = selectedTier === "full"
+    ? ALL_TIERS
+    : ALL_TIERS.filter(t => t.key === selectedTier);
 
   const height = tiers.length * rowHeight + padding * 2;
   const canvas = createCanvas(width, height);
@@ -211,7 +214,7 @@ async function generateTierListImage() {
       ctx.strokeStyle = "#000000";
       ctx.lineWidth = 3;
       ctx.strokeRect(x, y, iconSize, iconSize);
-      x += iconSize + 8;
+      x += iconSize + 6;
       } catch (e) {
         console.error("Error dibujando killer:", key, e);
       }
@@ -245,7 +248,22 @@ const infoKillerCommand = new SlashCommandBuilder()
 
 const tierListCommand = new SlashCommandBuilder()
   .setName("tier-list")
-  .setDescription("Genera una imagen con la tier list actual");
+  .setDescription("Genera una imagen con la tier list")
+  .addStringOption(o =>
+    o.setName("tier")
+      .setDescription("Selecciona qué tier mostrar")
+      .setRequired(false)
+      .addChoices(
+        { name: "Full", value: "full" },
+        { name: "Tier 1", value: "tier1" },
+        { name: "Tier 2", value: "tier2" },
+        { name: "Tier 3", value: "tier3" },
+        { name: "Tier 4", value: "tier4" },
+        { name: "Tier 5", value: "tier5" },
+        { name: "Deshabilitado", value: "deshabilitado" }
+      )
+  );
+
 /* =====================
    REGISTRO
 ===================== */

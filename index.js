@@ -144,7 +144,7 @@ async function generateTierListImage() {
     { label: "Tier 3", killers: lists.tier3 },
     { label: "Tier 4", killers: lists.tier4 },
     { label: "Tier 5", killers: lists.tier5 },
-    { label: "Deshabilitado", killers: lists.deshabilitado }
+    { label: "Deshab.", killers: lists.deshabilitado }
   ];
 
   const height = tiers.length * rowHeight + padding * 2;
@@ -154,7 +154,7 @@ async function generateTierListImage() {
   /* =====================
      FONDO GENERAL
   ===================== */
-  ctx.fillStyle = "#2b0f14"; // rojo oscuro
+  ctx.fillStyle = "#0f0f12";
   ctx.fillRect(0, 0, width, height);
 
   ctx.font = "bold 30px sans-serif";
@@ -195,15 +195,18 @@ async function generateTierListImage() {
         ===================== */
         ctx.drawImage(portraitBG, x, y, iconSize, iconSize);
 
-        /* TINTE ROJO OSCURO */
+        
+
+        const img = await loadImage(data.image);
+
+        /* dibuja imagen original */
+        ctx.drawImage(img, x, y, iconSize, iconSize);
+        
+        /* tinte sutil al retrato */
         ctx.globalCompositeOperation = "source-atop";
-        ctx.fillStyle = "rgba(90, 10, 15, 0.65)";
+        ctx.fillStyle = "rgba(80, 0, 0, 0.35)"; // rojo oscuro MUY sutil
         ctx.fillRect(x, y, iconSize, iconSize);
         ctx.globalCompositeOperation = "source-over";
-
-        /* KILLER ENCIMA */
-        const img = await loadImage(data.image);
-        ctx.drawImage(img, x, y, iconSize, iconSize);
 
         x += iconSize + 14;
       } catch {

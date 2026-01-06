@@ -182,21 +182,20 @@ async function generateTierListImage() {
       if (!data) continue;
 
       try {
-        // 1️⃣ Base
-        ctx.drawImage(portraitBaseBG, x, y, iconSize, iconSize);
-
-        // 2️⃣ Sombra
-        ctx.drawImage(portraitShadowBG, x, y, iconSize, iconSize);
-
-        // 3️⃣ Portrait BG
-        ctx.drawImage(portraitBG, x, y, iconSize, iconSize);
-
-        // 4️⃣ Tinte SOLO al portraitBG
-        ctx.save();
-        ctx.globalCompositeOperation = "source-atop";
+        /* fondo base */
+        ctx.drawImage(portraitBaseBG, 0, 0, size, size);
+      
+        /* sombra */
+        ctx.drawImage(portraitShadowBG, 0, 0, size, size);
+      
+        /* portrait BG */
+        ctx.drawImage(portraitBG, 0, 0, size, size);
+      
+        /* tinte SOLO al portrait BG */
+        ctx.globalCompositeOperation = "multiply";
         ctx.fillStyle = "rgba(120, 10, 15, 0.85)";
-        ctx.fillRect(x, y, iconSize, iconSize);
-        ctx.restore();
+        ctx.fillRect(0, 0, size, size);
+        ctx.globalCompositeOperation = "source-over";;
 
         // 5️⃣ Killer intacto
         const img = await loadImage(data.image);
@@ -263,26 +262,24 @@ async function generateInfoKillerImage(killer) {
     "https://deadbydaylight.wiki.gg/images/CharPortrait_roleBG.webp"
   );
 
-  // 1️⃣ Base
+  /* fondo base */
   ctx.drawImage(portraitBaseBG, 0, 0, size, size);
 
-  // 2️⃣ Sombra
+  /* sombra */
   ctx.drawImage(portraitShadowBG, 0, 0, size, size);
 
-  // 3️⃣ Portrait BG
+  /* portrait BG */
   ctx.drawImage(portraitBG, 0, 0, size, size);
 
-  // 4️⃣ Tinte SOLO al portraitBG
-  ctx.save();
-  ctx.globalCompositeOperation = "source-atop";
+  /* tinte SOLO al portrait BG */
+  ctx.globalCompositeOperation = "multiply";
   ctx.fillStyle = "rgba(120, 10, 15, 0.85)";
   ctx.fillRect(0, 0, size, size);
-  ctx.restore();
+  ctx.globalCompositeOperation = "source-over";
 
-  // 5️⃣ Killer
+  /* killer */
   const img = await loadImage(killer.image);
   ctx.drawImage(img, 0, 0, size, size);
-
   return canvas.toBuffer("image/png");
 }
 

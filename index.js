@@ -201,7 +201,10 @@ async function generateTierListImage() {
         
         /* 3️⃣ killer encima (sin modificar color) */
         const img = await loadImage(data.image);
+        ctx.globalCompositeOperation = "multiply";
         ctx.drawImage(img, x, y, iconSize, iconSize);
+        ctx.globalCompositeOperation = "source-over";
+
               x += iconSize + 14;
       } catch {
         // ignora errores de imagen

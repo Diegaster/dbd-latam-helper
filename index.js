@@ -267,7 +267,7 @@ async function generateInfoKillerImage(killer) {
   const ctx = canvas.getContext("2d");
 
   /* fondo general */
-  ctx.fillStyle = "#1c1c1e";
+  ctx.fillStyle = "#000000";
   ctx.fillRect(0, 0, canvasWidth, canvasHeight);
 
   /* =====================
@@ -322,9 +322,16 @@ async function generateInfoKillerImage(killer) {
   /* killer intacto */
   const img = await loadImage(killer.image);
   ctx.drawImage(img, x, y, portraitSize, portraitSize);
+  const framePadding = 10;
+
   ctx.strokeStyle = "#000000";
-  ctx.lineWidth = 6;
-  ctx.strokeRect(x - 3, y - 3, portraitSize + 6, portraitSize + 6);
+  ctx.lineWidth = 8;
+  ctx.strokeRect(
+    x - framePadding,
+    y - framePadding,
+    portraitSize + framePadding * 2,
+    portraitSize + framePadding * 2
+  );
   return canvas.toBuffer("image/png");
 }
 

@@ -1,16 +1,18 @@
 {
-  "name": "dbd-latam-helper",
+  "name": "discord-pick-ban-b",
   "version": "1.0.0",
+  "description": "Discord bot Pick & Ban",
   "main": "index.js",
+  "type": "commonjs",
   "scripts": {
     "start": "node index.js"
+  },
+  "engines": {
+    "node": "18.x"
   },
   "dependencies": {
     "discord.js": "^14.14.1",
     "dotenv": "^16.4.5",
     "canvas": "^2.11.2"
-  }
-  "engines": {
-    "node": "18.x"
   }
 }

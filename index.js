@@ -264,6 +264,20 @@ const tierListCommand = new SlashCommandBuilder()
       )
   );
 
+const matchCommand = new SlashCommandBuilder()
+  .setName("match")
+  .setDescription("Crea un canal de Pick & Ban entre dos equipos")
+  .addRoleOption(o =>
+    o.setName("equipo1")
+     .setDescription("Rol del Equipo 1")
+     .setRequired(true)
+  )
+  .addRoleOption(o =>
+    o.setName("equipo2")
+     .setDescription("Rol del Equipo 2")
+     .setRequired(true)
+  );
+
 /* =====================
    REGISTRO
 ===================== */
@@ -467,6 +481,54 @@ client.on("interactionCreate", async interaction => {
         components: createButtons(pool, step.action)
       });
     }
+    if (interaction.commandName === "match") {
+      const equipo1 = interaction.options.getRole("equipo1");
+      const equipo2 = interaction.options.getRole("equipo2");
+    
+      const STAFF_ROLE_ID = "1451359299392508128";
+    
+      const category = interaction.channel.parent;
+      if (!category) {
+        return interaction.reply({
+          content: "❌ Este comando debe usarse dentro de una categoría.",
+          ephemeral: true
+        });
+      }
+    
+      const channelName = `pb-${equipo1.name}-vs-${equipo2.name}`
+        .toLowerCase()
+        .replace(/\s+/g, "-");
+    
+      const channel = await interaction.guild.channels.create({
+        name: channelName,
+        type: 0, // GUILD_TEXT
+        parent: category.id,
+        permissionOverwrites: [
+          {
+            id: interaction.guild.id, // @everyone
+            deny: ["ViewChannel"]
+          },
+          {
+            id: equipo1.id,
+            allow: ["ViewChannel", "SendMessages", "ReadMessageHistory"]
+          },
+          {
+            id: equipo2.id,
+            allow: ["ViewChannel", "SendMessages", "ReadMessageHistory"]
+          },
+          {
+            id: STAFF_ROLE_ID,
+            allow: ["ViewChannel", "SendMessages", "ReadMessageHistory"]
+          }
+        ]
+      });
+    
+      await interaction.reply({
+        content: `✅ Canal creado: ${channel}`,
+        ephemeral: true
+      });
+    }
+
   }
 
   /* BOTONES */

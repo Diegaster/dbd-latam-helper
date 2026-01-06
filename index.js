@@ -305,7 +305,8 @@ async function generateInfoKillerImage(killer) {
 
   /* base */
   ctx.drawImage(portraitBaseBG, x, y, portraitSize, portraitSize);
-
+   /* sombra */
+  ctx.drawImage(portraitShadowBG, x, y, portraitSize, portraitSize);
 
   /* portrait BG */
   ctx.drawImage(portraitBG, x, y, portraitSize, portraitSize);
@@ -319,8 +320,6 @@ async function generateInfoKillerImage(killer) {
   /* killer intacto */
   const img = await loadImage(killer.image);
   ctx.drawImage(img, x, y, portraitSize, portraitSize);
-   /* sombra */
-  ctx.drawImage(portraitShadowBG, x, y, portraitSize, portraitSize);
   const framePadding = 10;
 
   ctx.strokeStyle = "#000000";

@@ -152,7 +152,7 @@ async function generateTierListImage() {
   const ctx = canvas.getContext("2d");
 
   /* Fondo general */
-  ctx.fillStyle = "#780a0f";
+  ctx.fillStyle = "#780a0fd9";
   ctx.fillRect(0, 0, width, height);
   
   ctx.font = "bold 30px sans-serif";
@@ -172,7 +172,7 @@ async function generateTierListImage() {
   let y = padding;
 
   for (const tier of tiers) {
-    ctx.fillStyle = "#780a0f";
+    ctx.fillStyle = "#780a0fd9";
     ctx.fillRect(0, y - 6, width, rowHeight);
 
     /* barra de color */
@@ -257,9 +257,40 @@ client.once("ready", async () => {
   console.log("🤖 Bot listo");
 });
 async function generateInfoKillerImage(killer) {
-  const size = 256;
-  const canvas = createCanvas(size, size);
+  const canvasWidth = 800;
+  const canvasHeight = 320;
+  const portraitSize = 256;
+
+  const canvas = createCanvas(canvasWidth, canvasHeight);
   const ctx = canvas.getContext("2d");
+
+  /* fondo general */
+  ctx.fillStyle = "#1c1c1e";
+  ctx.fillRect(0, 0, canvasWidth, canvasHeight);
+
+  /* =====================
+     TEXTO (IZQUIERDA)
+  ===================== */
+  ctx.fillStyle = "#ffffff";
+  ctx.font = "bold 32px sans-serif";
+  ctx.fillText(killer.display.toUpperCase(), 32, 48);
+
+  ctx.font = "20px sans-serif";
+  ctx.fillText("🌎 Nombre en español:", 32, 96);
+  ctx.fillText(killer.spanish || "—", 32, 124);
+
+  ctx.fillText("🧠 Alias:", 32, 168);
+  ctx.fillText(
+    killer.aliases.length ? killer.aliases.join(", ") : "—",
+    32,
+    196
+  );
+
+  /* =====================
+     RETRATO (DERECHA)
+  ===================== */
+  const x = canvasWidth - portraitSize - 32;
+  const y = 32;
 
   const portraitBaseBG = await loadImage(
     "https://deadbydaylight.wiki.gg/images/4/42/CharPortrait_bg.webp"
@@ -271,26 +302,28 @@ async function generateInfoKillerImage(killer) {
     "https://deadbydaylight.wiki.gg/images/CharPortrait_roleBG.webp"
   );
 
-  /* fondo base */
-  ctx.drawImage(portraitBaseBG, 0, 0, size, size);
+  /* base */
+  ctx.drawImage(portraitBaseBG, x, y, portraitSize, portraitSize);
 
   /* sombra */
-  ctx.drawImage(portraitShadowBG, 0, 0, size, size);
+  ctx.drawImage(portraitShadowBG, x, y, portraitSize, portraitSize);
 
   /* portrait BG */
-  ctx.drawImage(portraitBG, 0, 0, size, size);
+  ctx.drawImage(portraitBG, x, y, portraitSize, portraitSize);
 
-  /* tinte SOLO al portrait BG */
+  /* multiply SOLO al portraitBG */
   ctx.globalCompositeOperation = "multiply";
   ctx.fillStyle = "rgba(120, 10, 15, 0.85)";
-  ctx.fillRect(0, 0, size, size);
+  ctx.fillRect(x, y, portraitSize, portraitSize);
   ctx.globalCompositeOperation = "source-over";
 
-  /* killer */
+  /* killer intacto */
   const img = await loadImage(killer.image);
-  ctx.drawImage(img, 0, 0, size, size);
+  ctx.drawImage(img, x, y, portraitSize, portraitSize);
+
   return canvas.toBuffer("image/png");
 }
+
 
 
 /* =====================

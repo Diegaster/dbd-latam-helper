@@ -194,7 +194,8 @@ async function generateTierListImage() {
       try {
        /* fondo base */
       ctx.drawImage(portraitBaseBG, x, y, iconSize, iconSize);
-      
+      /* sombra */
+      ctx.drawImage(portraitShadowBG, x, y, iconSize, iconSize);
       /* portrait BG (wiki) */
       ctx.drawImage(portraitBG, x, y, iconSize, iconSize);
       
@@ -207,8 +208,6 @@ async function generateTierListImage() {
       /* retrato del killer (sin modificar) */
       const img = await loadImage(data.image);
       ctx.drawImage(img, x, y, iconSize, iconSize);
-      /* sombra */
-      ctx.drawImage(portraitShadowBG, x, y, iconSize, iconSize);
       ctx.strokeStyle = "#000000";
       ctx.lineWidth = 3;
       ctx.strokeRect(x, y, iconSize, iconSize);

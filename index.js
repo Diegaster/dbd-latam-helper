@@ -164,6 +164,13 @@ async function generateTierListImage() {
   const portraitBG = await loadImage(
     "https://deadbydaylight.wiki.gg/images/CharPortrait_roleBG.webp"
   );
+  const portraitBaseBG = await loadImage(
+  "https://deadbydaylight.wiki.gg/images/4/42/CharPortrait_bg.webp"
+  );
+  
+  const portraitShadowBG = await loadImage(
+    "https://deadbydaylight.wiki.gg/images/c/cb/CharPortrait_shadowBG.webp"
+  );
 
   let y = padding;
 
@@ -171,7 +178,7 @@ async function generateTierListImage() {
     /* =====================
        FONDO DE FILA
     ===================== */
-    ctx.fillStyle = "#000000";
+    ctx.fillStyle = "#565756";
     ctx.fillRect(0, y - 6, width, rowHeight);
 
     /* Barra de color del tier */
@@ -193,7 +200,9 @@ async function generateTierListImage() {
         /* =====================
            FONDO DE RETRATO
         ===================== */
-       ctx.drawImage(portraitBG, x, y, iconSize, iconSize);
+        ctx.drawImage(portraitBaseBG, x, y, iconSize, iconSize);
+        ctx.drawImage(portraitShadowBG, x, y, iconSize, iconSize);
+        ctx.drawImage(portraitBG, x, y, iconSize, iconSize);
         ctx.globalCompositeOperation = "multiply";
         ctx.fillStyle = "rgba(120, 10, 15, 0.85)";
         ctx.fillRect(x, y, iconSize, iconSize);

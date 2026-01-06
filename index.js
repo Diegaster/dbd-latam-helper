@@ -45,7 +45,7 @@ const killersData = {
   Clown: { display: "Clown", spanish: "Payaso", aliases: ["Kenneth Chase", "Jeffrey Hawk"], image: "https://deadbydaylight.wiki.gg/images/d/d1/K12_TheClown_Portrait.png?26bd2a" },
   Nightmare: { display: "Nightmare", spanish: "Pesadilla", aliases: ["Freddy Krueger"], image: "https://deadbydaylight.wiki.gg/images/d/d5/K10_TheNightmare_Portrait.png?8dfa33" },
   Executioner: { display: "Executioner", spanish: "Ejecutor", aliases: ["Pyramid Head"], image: "https://deadbydaylight.wiki.gg/images/c/c9/K20_TheExecutioner_Portrait.png?286cd2" },
-  Xenomorph: { display: "Xenomorph", spanish: "Xenomorfo", aliases: [], image: "https://deadbydaylight.wiki.gg/images/6/64/K33_TheXenomorph_Portrait.png?17ff7e"" },
+  Xenomorph: { display: "Xenomorph", spanish: "Xenomorfo", aliases: [], image: "https://deadbydaylight.wiki.gg/images/6/64/K33_TheXenomorph_Portrait.png?17ff7e" },
   Unknown: { display: "Unknown", spanish: "Desconocido", aliases: [], image: "https://deadbydaylight.wiki.gg/images/5/51/K35_TheUnknown_Portrait.png?88bbed" },
   GoodGuy: { display: "Good Guy", spanish: "Chico Bueno", aliases: ["Chucky", "Charles Lee Ray"], image: "https://deadbydaylight.wiki.gg/images/8/81/K34_TheGoodGuy_Portrait.png?4dc7a9" },
   Lich: { display: "Lich", spanish: "Liche", aliases: ["Vecna"], image: "https://deadbydaylight.wiki.gg/images/K36_TheLich_Portrait.png?25df98" },

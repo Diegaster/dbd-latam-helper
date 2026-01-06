@@ -24,6 +24,15 @@ const games = new Map();
 /* =====================
    KILLERS DATA
 ===================== */
+const DISABLED_KILLERS = ["Shape", "Knight", "SkullMerchant", "Nemesis"];
+const TIER_COLORS = {
+  "Tier 1": "#ff4d4d",
+  "Tier 2": "#ff944d",
+  "Tier 3": "#ffd24d",
+  "Tier 4": "#4dd2ff",
+  "Tier 5": "#4dff88",
+  "Deshabilitado": "#666666"
+};
 const killersData = {
   Nurse: { display: "The Nurse", spanish: "Enfermera", aliases: ["Sally Smithson"], image: "https://deadbydaylight.wiki.gg/images/3/3b/K04_TheNurse_Portrait.png" },
   Blight: { display: "The Blight", spanish: "Deterioro", aliases: ["Talbot Grimes"], image: "https://deadbydaylight.wiki.gg/images/K21_TheBlight_Portrait.png" },
@@ -120,50 +129,53 @@ function buildPickBanEmbed(game, player, action, coin = null) {
   return embed;
 }
 async function generateTierListImage() {
-  const iconSize = 96;
-  const padding = 20;
-  const rowHeight = iconSize + 20;
-  const width = 1400;
+  const iconSize = 88;
+  const padding = 24;
+  const rowHeight = iconSize + 28;
+  const width = 1500;
 
   const tiers = [
     { label: "Tier 1", killers: lists.tier1 },
     { label: "Tier 2", killers: lists.tier2 },
     { label: "Tier 3", killers: lists.tier3 },
     { label: "Tier 4", killers: lists.tier4 },
-    { label: "Tier 5", killers: lists.tier5 }
+    { label: "Tier 5", killers: lists.tier5 },
+    {
+      label: "Deshabilitado",
+      killers: DISABLED_KILLERS.map(k =>
+        Object.values(killersData)
+          .find(d => normalizeKillerKey(d.display) === k)?.display.replace("The ", "")
+      ).filter(Boolean)
+    }
   ];
-
-  const tieredNames = new Set(tiers.flatMap(t => t.killers));
-
-  const disabled = Object.values(killersData)
-    .filter(k => {
-      const name = k.display.replace("The ", "");
-      return !tieredNames.has(name);
-    })
-    .map(k => k.display.replace("The ", ""));
-
-  tiers.push({
-    label: "Disabled",
-    killers: disabled
-  });
 
   const height = tiers.length * rowHeight + padding * 2;
   const canvas = createCanvas(width, height);
   const ctx = canvas.getContext("2d");
 
-  ctx.fillStyle = "#2b2d31";
+  /* Fondo general */
+  ctx.fillStyle = "#1e1f22";
   ctx.fillRect(0, 0, width, height);
 
-  ctx.font = "bold 28px sans-serif";
+  ctx.font = "bold 30px sans-serif";
   ctx.textBaseline = "middle";
-  ctx.fillStyle = "#ffffff";
 
   let y = padding;
 
   for (const tier of tiers) {
-    ctx.fillText(tier.label, 20, y + iconSize / 2);
+    /* Fondo de fila */
+    ctx.fillStyle = "#2b2d31";
+    ctx.fillRect(0, y - 6, width, rowHeight);
 
-    let x = 180;
+    /* Barra de color */
+    ctx.fillStyle = TIER_COLORS[tier.label] || "#ffffff";
+    ctx.fillRect(0, y - 6, 14, rowHeight);
+
+    /* Texto del tier */
+    ctx.fillStyle = "#ffffff";
+    ctx.fillText(tier.label, 30, y + iconSize / 2);
+
+    let x = 200;
 
     for (const killerName of tier.killers) {
       const key = normalizeKillerKey(killerName);
@@ -172,8 +184,13 @@ async function generateTierListImage() {
 
       try {
         const img = await loadImage(data.image);
+
+        /* Marco */
+        ctx.fillStyle = "#000000";
+        ctx.fillRect(x - 2, y - 2, iconSize + 4, iconSize + 4);
+
         ctx.drawImage(img, x, y, iconSize, iconSize);
-        x += iconSize + 10;
+        x += iconSize + 14;
       } catch {
         // ignora errores de imagen
       }

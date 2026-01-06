@@ -171,7 +171,7 @@ async function generateTierListImage() {
     /* =====================
        FONDO DE FILA
     ===================== */
-    ctx.fillStyle = "#161012"; // casi negro
+    ctx.fillStyle = #000000
     ctx.fillRect(0, y - 6, width, rowHeight);
 
     /* Barra de color del tier */
@@ -199,11 +199,8 @@ async function generateTierListImage() {
         ctx.fillRect(x, y, iconSize, iconSize);
         ctx.globalCompositeOperation = "source-over";
         
-        /* 3️⃣ killer encima (sin modificar color) */
         const img = await loadImage(data.image);
-        ctx.globalCompositeOperation = "multiply";
         ctx.drawImage(img, x, y, iconSize, iconSize);
-        ctx.globalCompositeOperation = "source-over";
 
               x += iconSize + 14;
       } catch {

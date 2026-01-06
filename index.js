@@ -73,7 +73,8 @@ const killersData = {
   Nemesis: { display: "The Nemesis", spanish: "Némesis", aliases: [], image: "https://deadbydaylight.wiki.gg/images/K24_TheNemesis_Portrait.png"},
   Knight: { display: "The Knight", spanish: "Caballero", aliases: ["Tarhos Kovács"], image: "https://deadbydaylight.wiki.gg/images/6/69/K30_TheKnight_Portrait.png"},
   SkullMerchant: { display: "The Skull Merchant", spanish: "Comerciante de Calaveras", aliases: ["Adriana Imai"], image: "https://deadbydaylight.wiki.gg/images/6/64/K31_TheSkullMerchant_Portrait.png"},
-  Shape: { display: "The Shape", spanish: "La Forma", aliases: ["Michael Myers"], image: "https://deadbydaylight.wiki.gg/images/b/b5/K05_TheShape_Portrait.png"}
+  Shape: { display: "The Shape", spanish: "La Forma", aliases: ["Michael Myers"], image: "https://deadbydaylight.wiki.gg/images/b/b5/K05_TheShape_Portrait.png"},
+  First: { display: "The First", spanish: "El Primero", aliases: ["Vecna", "Henry Creel", "Uno"], image: "https://deadbydaylight.wiki.gg/images/K42_TheFirst_Portrait.png?90c96a"}
 };
 
 /* =====================
@@ -85,7 +86,7 @@ const lists = {
   tier3: ["Plague","Doctor","Clown","Nightmare","Executioner","Xenomorph","Unknown","Good Guy","Lich","Houndmaster"],
   tier4: ["Wraith","Deathslinger","Animatronic","Demogorgon","Dredge","Onryo", "Cannibal"],
   tier5: ["Trickster","Legion", "Hag","Pig","GhostFace","Trapper"],
-  deshabilitado:["Shape", "Skull Merchant", "Knight", "Nemesis"]
+  deshabilitado:["Shape", "Skull Merchant", "Knight", "Nemesis", "First"]
 };
 
 const pickRandom = (arr, n) => [...arr].sort(() => Math.random() - 0.5).slice(0, n);

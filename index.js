@@ -200,16 +200,25 @@ async function generateTierListImage() {
         /* =====================
            FONDO DE RETRATO
         ===================== */
-        ctx.drawImage(portraitBaseBG, x, y, iconSize, iconSize);
-        ctx.drawImage(portraitShadowBG, x, y, iconSize, iconSize);
-        ctx.drawImage(portraitBG, x, y, iconSize, iconSize);
-        ctx.globalCompositeOperation = "multiply";
+        // 1️⃣ Base (no se toca)
+        ctx.drawImage(portraitBaseBG, x, y, size, size);
+        
+        // 2️⃣ Dibujamos portraitBG
+        ctx.drawImage(portraitBG, x, y, size, size);
+        
+        // 3️⃣ APLICAMOS TINTE SOLO DONDE portraitBG EXISTE
+        ctx.globalCompositeOperation = "source-atop";
         ctx.fillStyle = "rgba(120, 10, 15, 0.85)";
-        ctx.fillRect(x, y, iconSize, iconSize);
+        ctx.fillRect(x, y, size, size);
         ctx.globalCompositeOperation = "source-over";
         
+        // 4️⃣ Sombra (sin filtros)
+        ctx.drawImage(portraitShadowBG, x, y, size, size);
+        
+        // 5️⃣ Killer (intacto)
         const img = await loadImage(data.image);
-        ctx.drawImage(img, x, y, iconSize, iconSize);
+        ctx.drawImage(img, x, y, size, size);
+
 
               x += iconSize + 14;
       } catch {
@@ -272,20 +281,20 @@ async function generateInfoKillerImage(killer) {
     "https://deadbydaylight.wiki.gg/images/CharPortrait_roleBG.webp"
   );
 
-  /* fondo base */
-  ctx.drawImage(portraitBaseBG, 0, 0, size, size);
-
-  /* sombra */
-  ctx.drawImage(portraitShadowBG, 0, 0, size, size);
-
-  /* portrait BG */
-  ctx.drawImage(portraitBG, 0, 0, size, size);
-
-  /* tinte SOLO al portrait BG */
-  ctx.globalCompositeOperation = "multiply";
+    // 1️⃣ Base (no se toca)
+  ctx.drawImage(portraitBaseBG, x, y, size, size);
+  
+  // 2️⃣ Dibujamos portraitBG
+  ctx.drawImage(portraitBG, x, y, size, size);
+  
+  // 3️⃣ APLICAMOS TINTE SOLO DONDE portraitBG EXISTE
+  ctx.globalCompositeOperation = "source-atop";
   ctx.fillStyle = "rgba(120, 10, 15, 0.85)";
-  ctx.fillRect(0, 0, size, size);
+  ctx.fillRect(x, y, size, size);
   ctx.globalCompositeOperation = "source-over";
+  
+  // 4️⃣ Sombra (sin filtros)
+  ctx.drawImage(portraitShadowBG, x, y, size, size);
 
   /* killer */
   const img = await loadImage(killer.image);

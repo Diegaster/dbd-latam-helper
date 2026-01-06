@@ -10,6 +10,7 @@ const {
   Routes,
   EmbedBuilder
 } = require("discord.js");
+const { createCanvas, loadImage } = require("canvas");
 
 const client = new Client({
   intents: [GatewayIntentBits.Guilds]
@@ -97,7 +98,11 @@ function createButtons(remaining, action) {
   if (row.components.length) rows.push(row);
   return rows;
 }
-
+function normalizeKillerKey(name) {
+  return name
+    .replace(/\s/g, "")
+    .replace("ō", "o");
+}
 /* =====================
    EMBED PICK & BAN
 ===================== */
@@ -114,7 +119,71 @@ function buildPickBanEmbed(game, player, action, coin = null) {
   if (coin) embed.setDescription(`🪙 **Lanzamiento de moneda:** ${coin}`);
   return embed;
 }
+async function generateTierListImage() {
+  const iconSize = 96;
+  const padding = 20;
+  const rowHeight = iconSize + 20;
+  const width = 1400;
 
+  const tiers = [
+    { label: "Tier 1", killers: lists.tier1 },
+    { label: "Tier 2", killers: lists.tier2 },
+    { label: "Tier 3", killers: lists.tier3 },
+    { label: "Tier 4", killers: lists.tier4 },
+    { label: "Tier 5", killers: lists.tier5 }
+  ];
+
+  const tieredNames = new Set(tiers.flatMap(t => t.killers));
+
+  const disabled = Object.values(killersData)
+    .filter(k => {
+      const name = k.display.replace("The ", "");
+      return !tieredNames.has(name);
+    })
+    .map(k => k.display.replace("The ", ""));
+
+  tiers.push({
+    label: "Disabled",
+    killers: disabled
+  });
+
+  const height = tiers.length * rowHeight + padding * 2;
+  const canvas = createCanvas(width, height);
+  const ctx = canvas.getContext("2d");
+
+  ctx.fillStyle = "#2b2d31";
+  ctx.fillRect(0, 0, width, height);
+
+  ctx.font = "bold 28px sans-serif";
+  ctx.textBaseline = "middle";
+  ctx.fillStyle = "#ffffff";
+
+  let y = padding;
+
+  for (const tier of tiers) {
+    ctx.fillText(tier.label, 20, y + iconSize / 2);
+
+    let x = 180;
+
+    for (const killerName of tier.killers) {
+      const key = normalizeKillerKey(killerName);
+      const data = killersData[key];
+      if (!data) continue;
+
+      try {
+        const img = await loadImage(data.image);
+        ctx.drawImage(img, x, y, iconSize, iconSize);
+        x += iconSize + 10;
+      } catch {
+        // ignora errores de imagen
+      }
+    }
+
+    y += rowHeight;
+  }
+
+  return canvas.toBuffer("image/png");
+}
 /* =====================
    SLASH COMMANDS
 ===================== */
@@ -134,6 +203,9 @@ const infoKillerCommand = new SlashCommandBuilder()
      .setAutocomplete(true)
   );
 
+const tierListCommand = new SlashCommandBuilder()
+  .setName("tier-list")
+  .setDescription("Genera una imagen con la tier list actual");
 /* =====================
    REGISTRO
 ===================== */
@@ -141,7 +213,7 @@ client.once("ready", async () => {
   const rest = new REST({ version: "10" }).setToken(process.env.TOKEN);
   await rest.put(
     Routes.applicationCommands(client.user.id),
-    { body: [pickBanCommand.toJSON(), infoKillerCommand.toJSON()] }
+    { body: [pickBanCommand.toJSON(), infoKillerCommand.toJSON(), tierListCommand.toJSON()] }
   );
   console.log("🤖 Bot listo");
 });
@@ -168,7 +240,15 @@ client.on("interactionCreate", async interaction => {
   }
 
   if (interaction.isChatInputCommand()) {
-
+    if (interaction.commandName === "tier-list") {
+      await interaction.deferReply();
+    
+      const buffer = await generateTierListImage();
+    
+      return interaction.editReply({
+        files: [{ attachment: buffer, name: "tierlist.png" }]
+      });
+    }
     /* INFO KILLER */
     if (interaction.commandName === "info-killer") {
       const key = interaction.options.getString("killer");

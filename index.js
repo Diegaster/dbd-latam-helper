@@ -39,7 +39,7 @@ const killersData = {
   Hillbilly: { display: "The Hillbilly", spanish: "Pueblerino", aliases: ["Max Thompson Jr."], image: "https://deadbydaylight.wiki.gg/images/2/24/K03_TheHillbilly_Portrait.png" },
   Ghoul: { display: "The Ghoul", spanish: "-", aliases: ["Ken Kaneki", "Rize Kamishiro"], image: "https://deadbydaylight.wiki.gg/images/K39_TheGhoul_Portrait.png" },
   Krasue: { display: "The Krasue", spanish: "-", aliases: ["Burong Sukapat"], image: "https://deadbydaylight.wiki.gg/images/K41_TheKrasue_Portrait.png" },
-  Singularity: { display: "The Singularity", spanish: "Singularidad", aliases: [], image: "https://deadbydaylight.wiki.gg/images/2/24/K32_TheSingularity_Portrait.png" },
+  Singularity: { display: "The Singularity", spanish: "Singularidad", aliases: ["HUX-A7-13"], image: "https://deadbydaylight.wiki.gg/images/2/24/K32_TheSingularity_Portrait.png" },
   Spirit: { display: "The Spirit", spanish: "Espíritu", aliases: ["Rin Yamaoka"], image: "https://deadbydaylight.wiki.gg/images/f/f1/K13_TheSpirit_Portrait.png" },
   Twins: { display: "The Twins", spanish: "Mellizos", aliases: ["Charlotte & Victor Deshayes"], image: "https://deadbydaylight.wiki.gg/images/1/17/K22_TheTwins_Portrait.png" },
   DarkLord: { display: "The Dark Lord", spanish: "Señor Oscuro", aliases: ["Drácula"], image: "https://deadbydaylight.wiki.gg/images/K37_TheDarkLord_Portrait.png" },

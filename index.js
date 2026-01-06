@@ -144,35 +144,41 @@ async function generateTierListImage() {
     { label: "Tier 3", killers: lists.tier3 },
     { label: "Tier 4", killers: lists.tier4 },
     { label: "Tier 5", killers: lists.tier5 },
-    { label: "Deshab.", killers: lists.deshabilitado }
+    { label: "Deshabilitado", killers: lists.deshabilitado }
   ];
 
   const height = tiers.length * rowHeight + padding * 2;
   const canvas = createCanvas(width, height);
   const ctx = canvas.getContext("2d");
 
-  /* Fondo general */
-  ctx.fillStyle = "#1e1f22";
+  /* =====================
+     FONDO GENERAL
+  ===================== */
+  ctx.fillStyle = "#2b0f14"; // rojo oscuro
   ctx.fillRect(0, 0, width, height);
 
   ctx.font = "bold 30px sans-serif";
   ctx.textBaseline = "middle";
 
-  /* precargar fondo de retratos */
-  const portraitBG = await loadImage("https://deadbydaylight.wiki.gg/images/CharPortrait_roleBG.webp");
+  /* Fondo base de retratos (wiki) */
+  const portraitBG = await loadImage(
+    "https://deadbydaylight.wiki.gg/images/CharPortrait_roleBG.webp"
+  );
 
   let y = padding;
 
   for (const tier of tiers) {
-    /* filas alternadas */
-    ctx.fillStyle = "#2b2d31";
+    /* =====================
+       FONDO DE FILA
+    ===================== */
+    ctx.fillStyle = "#161012"; // casi negro
     ctx.fillRect(0, y - 6, width, rowHeight);
 
-    /* barra de color */
+    /* Barra de color del tier */
     ctx.fillStyle = TIER_COLORS[tier.label] || "#ffffff";
     ctx.fillRect(0, y - 6, 14, rowHeight);
 
-    /* texto del tier */
+    /* Texto del tier */
     ctx.fillStyle = "#ffffff";
     ctx.fillText(tier.label, 30, y + iconSize / 2);
 
@@ -184,14 +190,24 @@ async function generateTierListImage() {
       if (!data) continue;
 
       try {
-        /* dibuja fondo de retrato */
+        /* =====================
+           FONDO DE RETRATO
+        ===================== */
         ctx.drawImage(portraitBG, x, y, iconSize, iconSize);
-        /* luego dibuja la imagen encima */
+
+        /* TINTE ROJO OSCURO */
+        ctx.globalCompositeOperation = "source-atop";
+        ctx.fillStyle = "rgba(90, 10, 15, 0.65)";
+        ctx.fillRect(x, y, iconSize, iconSize);
+        ctx.globalCompositeOperation = "source-over";
+
+        /* KILLER ENCIMA */
         const img = await loadImage(data.image);
         ctx.drawImage(img, x, y, iconSize, iconSize);
+
         x += iconSize + 14;
       } catch {
-        // ignora errores
+        // ignora errores de imagen
       }
     }
 
@@ -200,6 +216,7 @@ async function generateTierListImage() {
 
   return canvas.toBuffer("image/png");
 }
+
 
 /* =====================
    SLASH COMMANDS

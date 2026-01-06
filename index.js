@@ -134,9 +134,9 @@ function buildPickBanEmbed(game, player, action, coin = null) {
   return embed;
 }
 async function generateTierListImage() {
-  const iconSize = 88;
-  const padding = 24;
-  const rowHeight = iconSize + 28;
+  const iconSize = 112;
+  const padding = 16;
+  const rowHeight = iconSize + 20;
   const width = 1500;
 
   const tiers = [
@@ -211,7 +211,7 @@ async function generateTierListImage() {
       ctx.strokeStyle = "#000000";
       ctx.lineWidth = 3;
       ctx.strokeRect(x, y, iconSize, iconSize);
-        x += iconSize + 14;
+      x += iconSize + 8;
       } catch (e) {
         console.error("Error dibujando killer:", key, e);
       }

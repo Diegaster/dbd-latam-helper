@@ -152,7 +152,7 @@ async function generateTierListImage() {
   const ctx = canvas.getContext("2d");
 
   /* Fondo general */
-  ctx.fillStyle = "#780a0fd9";
+  ctx.fillStyle = "#000000";
   ctx.fillRect(0, 0, width, height);
   
   ctx.font = "bold 30px sans-serif";
@@ -172,7 +172,7 @@ async function generateTierListImage() {
   let y = padding;
 
   for (const tier of tiers) {
-    ctx.fillStyle = "#780a0fd9";
+    ctx.fillStyle = "#000000";
     ctx.fillRect(0, y - 6, width, rowHeight);
 
     /* barra de color */
@@ -209,7 +209,9 @@ async function generateTierListImage() {
       /* 5️⃣ retrato del killer (sin modificar) */
       const img = await loadImage(data.image);
       ctx.drawImage(img, x, y, iconSize, iconSize);
-
+      ctx.strokeStyle = "#000000";
+      ctx.lineWidth = 3;
+      ctx.strokeRect(x, y, iconSize, iconSize);
         x += iconSize + 14;
       } catch (e) {
         console.error("Error dibujando killer:", key, e);
@@ -218,7 +220,7 @@ async function generateTierListImage() {
 
     y += rowHeight;
   }
-
+  
   return canvas.toBuffer("image/png");
 }
 
@@ -276,10 +278,10 @@ async function generateInfoKillerImage(killer) {
   ctx.fillText(killer.display.toUpperCase(), 32, 48);
 
   ctx.font = "20px sans-serif";
-  ctx.fillText("🌎 Nombre en español:", 32, 96);
+  ctx.fillText("- Nombre en español:", 32, 96);
   ctx.fillText(killer.spanish || "—", 32, 124);
 
-  ctx.fillText("🧠 Alias:", 32, 168);
+  ctx.fillText("- Alias:", 32, 168);
   ctx.fillText(
     killer.aliases.length ? killer.aliases.join(", ") : "—",
     32,

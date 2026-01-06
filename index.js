@@ -151,42 +151,27 @@ async function generateTierListImage() {
   const canvas = createCanvas(width, height);
   const ctx = canvas.getContext("2d");
 
-  /* =====================
-     FONDO GENERAL
-  ===================== */
-  ctx.fillStyle = "#0f0f12";
+  /* Fondo general */
+  ctx.fillStyle = "#565756"; // gris oscuro uniforme
   ctx.fillRect(0, 0, width, height);
 
   ctx.font = "bold 30px sans-serif";
   ctx.textBaseline = "middle";
+  ctx.fillStyle = "#ffffff";
 
-  /* Fondo base de retratos (wiki) */
-  const portraitBG = await loadImage(
-    "https://deadbydaylight.wiki.gg/images/CharPortrait_roleBG.webp"
-  );
   const portraitBaseBG = await loadImage(
-  "https://deadbydaylight.wiki.gg/images/4/42/CharPortrait_bg.webp"
+    "https://deadbydaylight.wiki.gg/images/4/42/CharPortrait_bg.webp"
   );
-  
   const portraitShadowBG = await loadImage(
     "https://deadbydaylight.wiki.gg/images/c/cb/CharPortrait_shadowBG.webp"
+  );
+  const portraitBG = await loadImage(
+    "https://deadbydaylight.wiki.gg/images/CharPortrait_roleBG.webp"
   );
 
   let y = padding;
 
   for (const tier of tiers) {
-    /* =====================
-       FONDO DE FILA
-    ===================== */
-    ctx.fillStyle = "#565756";
-    ctx.fillRect(0, y - 6, width, rowHeight);
-
-    /* Barra de color del tier */
-    ctx.fillStyle = TIER_COLORS[tier.label] || "#ffffff";
-    ctx.fillRect(0, y - 6, 14, rowHeight);
-
-    /* Texto del tier */
-    ctx.fillStyle = "#ffffff";
     ctx.fillText(tier.label, 30, y + iconSize / 2);
 
     let x = 200;
@@ -197,32 +182,29 @@ async function generateTierListImage() {
       if (!data) continue;
 
       try {
-        /* =====================
-           FONDO DE RETRATO
-        ===================== */
-        // 1️⃣ Base (no se toca)
-        ctx.drawImage(portraitBaseBG, x, y, size, size);
-        
-        // 2️⃣ Dibujamos portraitBG
-        ctx.drawImage(portraitBG, x, y, size, size);
-        
-        // 3️⃣ APLICAMOS TINTE SOLO DONDE portraitBG EXISTE
+        // 1️⃣ Base
+        ctx.drawImage(portraitBaseBG, x, y, iconSize, iconSize);
+
+        // 2️⃣ Sombra
+        ctx.drawImage(portraitShadowBG, x, y, iconSize, iconSize);
+
+        // 3️⃣ Portrait BG
+        ctx.drawImage(portraitBG, x, y, iconSize, iconSize);
+
+        // 4️⃣ Tinte SOLO al portraitBG
+        ctx.save();
         ctx.globalCompositeOperation = "source-atop";
         ctx.fillStyle = "rgba(120, 10, 15, 0.85)";
-        ctx.fillRect(x, y, size, size);
-        ctx.globalCompositeOperation = "source-over";
-        
-        // 4️⃣ Sombra (sin filtros)
-        ctx.drawImage(portraitShadowBG, x, y, size, size);
-        
-        // 5️⃣ Killer (intacto)
+        ctx.fillRect(x, y, iconSize, iconSize);
+        ctx.restore();
+
+        // 5️⃣ Killer intacto
         const img = await loadImage(data.image);
-        ctx.drawImage(img, x, y, size, size);
+        ctx.drawImage(img, x, y, iconSize, iconSize);
 
-
-              x += iconSize + 14;
-      } catch {
-        // ignora errores de imagen
+        x += iconSize + 14;
+      } catch (e) {
+        console.error("Error dibujando killer:", key, e);
       }
     }
 
@@ -281,27 +263,29 @@ async function generateInfoKillerImage(killer) {
     "https://deadbydaylight.wiki.gg/images/CharPortrait_roleBG.webp"
   );
 
-    // 1️⃣ Base (no se toca)
-  ctx.drawImage(portraitBaseBG, x, y, size, size);
-  
-  // 2️⃣ Dibujamos portraitBG
-  ctx.drawImage(portraitBG, x, y, size, size);
-  
-  // 3️⃣ APLICAMOS TINTE SOLO DONDE portraitBG EXISTE
+  // 1️⃣ Base
+  ctx.drawImage(portraitBaseBG, 0, 0, size, size);
+
+  // 2️⃣ Sombra
+  ctx.drawImage(portraitShadowBG, 0, 0, size, size);
+
+  // 3️⃣ Portrait BG
+  ctx.drawImage(portraitBG, 0, 0, size, size);
+
+  // 4️⃣ Tinte SOLO al portraitBG
+  ctx.save();
   ctx.globalCompositeOperation = "source-atop";
   ctx.fillStyle = "rgba(120, 10, 15, 0.85)";
-  ctx.fillRect(x, y, size, size);
-  ctx.globalCompositeOperation = "source-over";
-  
-  // 4️⃣ Sombra (sin filtros)
-  ctx.drawImage(portraitShadowBG, x, y, size, size);
+  ctx.fillRect(0, 0, size, size);
+  ctx.restore();
 
-  /* killer */
+  // 5️⃣ Killer
   const img = await loadImage(killer.image);
   ctx.drawImage(img, 0, 0, size, size);
 
   return canvas.toBuffer("image/png");
 }
+
 
 /* =====================
    INTERACCIONES

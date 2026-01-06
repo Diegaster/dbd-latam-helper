@@ -257,6 +257,42 @@ client.once("ready", async () => {
   );
   console.log("🤖 Bot listo");
 });
+async function generateInfoKillerImage(killer) {
+  const size = 256;
+  const canvas = createCanvas(size, size);
+  const ctx = canvas.getContext("2d");
+
+  const portraitBaseBG = await loadImage(
+    "https://deadbydaylight.wiki.gg/images/4/42/CharPortrait_bg.webp"
+  );
+  const portraitShadowBG = await loadImage(
+    "https://deadbydaylight.wiki.gg/images/c/cb/CharPortrait_shadowBG.webp"
+  );
+  const portraitBG = await loadImage(
+    "https://deadbydaylight.wiki.gg/images/CharPortrait_roleBG.webp"
+  );
+
+  /* fondo base */
+  ctx.drawImage(portraitBaseBG, 0, 0, size, size);
+
+  /* sombra */
+  ctx.drawImage(portraitShadowBG, 0, 0, size, size);
+
+  /* portrait BG */
+  ctx.drawImage(portraitBG, 0, 0, size, size);
+
+  /* tinte SOLO al portrait BG */
+  ctx.globalCompositeOperation = "multiply";
+  ctx.fillStyle = "rgba(120, 10, 15, 0.85)";
+  ctx.fillRect(0, 0, size, size);
+  ctx.globalCompositeOperation = "source-over";
+
+  /* killer */
+  const img = await loadImage(killer.image);
+  ctx.drawImage(img, 0, 0, size, size);
+
+  return canvas.toBuffer("image/png");
+}
 
 /* =====================
    INTERACCIONES
@@ -290,22 +326,32 @@ client.on("interactionCreate", async interaction => {
       });
     }
     /* INFO KILLER */
-    if (interaction.commandName === "info-killer") {
-      const key = interaction.options.getString("killer");
-      const killer = killersData[key];
-      if (!killer) return interaction.reply({ content: "❌ Killer no encontrado.", ephemeral: true });
-
-      const embed = new EmbedBuilder()
-        .setTitle(killer.display.toUpperCase())
-        .setColor(0x5865F2)
-        .setThumbnail(killer.image)
-        .addFields(
-          { name: "🌎 Nombre en español", value: killer.spanish || "—", inline: true },
-          { name: "🧠 Alias", value: killer.aliases.length ? killer.aliases.join(", ") : "—", inline: true }
-        );
-
-      return interaction.reply({ embeds: [embed] });
+   if (interaction.commandName === "info-killer") {
+    const key = interaction.options.getString("killer");
+    const killer = killersData[key];
+    if (!killer) {
+      return interaction.reply({ content: "❌ Killer no encontrado.", ephemeral: true });
     }
+  
+    await interaction.deferReply();
+  
+    const buffer = await generateInfoKillerImage(killer);
+  
+    const embed = new EmbedBuilder()
+      .setTitle(killer.display.toUpperCase())
+      .setColor(0x5865F2)
+      .setImage("attachment://killer.png")
+      .addFields(
+        { name: "🌎 Nombre en español", value: killer.spanish || "—", inline: true },
+        { name: "🧠 Alias", value: killer.aliases.length ? killer.aliases.join(", ") : "—", inline: true }
+      );
+  
+    return interaction.editReply({
+      embeds: [embed],
+      files: [{ attachment: buffer, name: "killer.png" }]
+    });
+  }
+
 
     /* PICK & BAN */
     if (interaction.commandName === "pick-and-ban") {

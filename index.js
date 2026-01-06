@@ -24,52 +24,43 @@ const games = new Map();
    KILLERS DATA
 ===================== */
 const killersData = {
-  Nurse: { display: "Nurse", spanish: "Enfermera", aliases: ["Sally Smithson"], image: "https://deadbydaylight.wiki.gg/images/3/3b/K04_TheNurse_Portrait.png?f00131" },
-  Blight: { display: "Blight", spanish: "Deterioro", aliases: ["Talbot Grimes"], image: "https://deadbydaylight.wiki.gg/images/K21_TheBlight_Portrait.png?bb5b92" },
-  Hillbilly: { display: "Hillbilly", spanish: "Pueblerino", aliases: ["Max Thompson Jr."], image: "https://deadbydaylight.wiki.gg/images/2/24/K03_TheHillbilly_Portrait.png?b1fa3b" },
-  Ghoul: { display: "Ghoul", spanish: "-", aliases: ["Ken Kaneki", "Rize Kamishiro"], image: "https://deadbydaylight.wiki.gg/images/K39_TheGhoul_Portrait.png?fbb95c" },
-  Krasue: { display: "Krasue", spanish: "-", aliases: ["Burong Sukapat"], image: "https://deadbydaylight.wiki.gg/images/K41_TheKrasue_Portrait.png?3513ba" },
-  Singularity: { display: "Singularity", spanish: "Singularidad", aliases: [], image: "https://deadbydaylight.wiki.gg/images/2/24/K32_TheSingularity_Portrait.png?3d6300" },
-  Spirit: { display: "Spirit", spanish: "Espíritu", aliases: ["Rin Yamaoka"], image: "https://deadbydaylight.wiki.gg/images/f/f1/K13_TheSpirit_Portrait.png?c6efeb" },
-
-  Twins: { display: "Twins", spanish: "Mellizos", aliases: ["Charlotte & Victor Deshayes"], image: "https://deadbydaylight.wiki.gg/images/1/17/K22_TheTwins_Portrait.png?71ef1c" },
-  DarkLord: { display: "Dark Lord", spanish: "Señor Oscuro", aliases: ["Drácula"], image: "https://deadbydaylight.wiki.gg/images/K37_TheDarkLord_Portrait.png?d391a7" },
-  Oni: { display: "Oni", spanish: "-", aliases: ["Kazan Yamoka"], image: "https://deadbydaylight.wiki.gg/images/8/80/K18_TheOni_Portrait.png?22e37f" },
-  Huntress: { display: "Huntress", spanish: "Cazadora", aliases: ["Anna"], image: "https://deadbydaylight.wiki.gg/images/f/f1/K08_TheHuntress_Portrait.png?194544" },
-  Artist: { display: "Artist", spanish: "Artista", aliases: ["Carmina Mora"], image: "https://deadbydaylight.wiki.gg/images/0/01/K26_TheArtist_Portrait.png?594628" },
-  Mastermind: { display: "Mastermind", spanish: "Mente Maestra", aliases: ["Albert Wesker"], image: "https://deadbydaylight.wiki.gg/images/e/ec/K29_TheMastermind_Portrait.png?84582c" },
-  Cenobite: { display: "Cenobite", spanish: "Cenobita", aliases: ["Elliot Spencer"], image: "https://deadbydaylight.wiki.gg/images/K25_TheCenobite_Portrait.png?6b9046" },
-
-  Plague: { display: "Plague", spanish: "Plaga", aliases: ["Adiris"], image: "https://deadbydaylight.wiki.gg/images/f/fe/K15_ThePlague_Portrait.png?e5926a" },
-  Doctor: { display: "Doctor", spanish: "-", aliases: ["Herman Carter"], image: "https://deadbydaylight.wiki.gg/images/5/58/K07_TheDoctor_Portrait.png?9b025f" },
-  Clown: { display: "Clown", spanish: "Payaso", aliases: ["Kenneth Chase", "Jeffrey Hawk"], image: "https://deadbydaylight.wiki.gg/images/d/d1/K12_TheClown_Portrait.png?26bd2a" },
-  Nightmare: { display: "Nightmare", spanish: "Pesadilla", aliases: ["Freddy Krueger"], image: "https://deadbydaylight.wiki.gg/images/d/d5/K10_TheNightmare_Portrait.png?8dfa33" },
-  Executioner: { display: "Executioner", spanish: "Ejecutor", aliases: ["Pyramid Head"], image: "https://deadbydaylight.wiki.gg/images/c/c9/K20_TheExecutioner_Portrait.png?286cd2" },
-  Xenomorph: { display: "Xenomorph", spanish: "Xenomorfo", aliases: [], image: "https://deadbydaylight.wiki.gg/images/6/64/K33_TheXenomorph_Portrait.png?17ff7e" },
-  Unknown: { display: "Unknown", spanish: "Desconocido", aliases: [], image: "https://deadbydaylight.wiki.gg/images/5/51/K35_TheUnknown_Portrait.png?88bbed" },
-  GoodGuy: { display: "Good Guy", spanish: "Chico Bueno", aliases: ["Chucky", "Charles Lee Ray"], image: "https://deadbydaylight.wiki.gg/images/8/81/K34_TheGoodGuy_Portrait.png?4dc7a9" },
-  Lich: { display: "Lich", spanish: "Liche", aliases: ["Vecna"], image: "https://deadbydaylight.wiki.gg/images/K36_TheLich_Portrait.png?25df98" },
-  Houndmaster: { display: "Houndmaster", spanish: "Adiestradora Canina", aliases: ["Portia Maye"], image: "https://deadbydaylight.wiki.gg/images/9/96/K38_TheHoundmaster_Portrait.png?6e438f" },
-
-  Wraith: { display: "Wraith", spanish: "Espectro", aliases: ["Phillip Ojomo"], image: "https://deadbydaylight.wiki.gg/images/c/c2/K02_TheWraith_Portrait.png?fbb21b" },
-  Deathslinger: { display: "Deathslinger", spanish: "Arponero de la Muerte", aliases: ["Caleb Quinn"], image: "https://deadbydaylight.wiki.gg/images/a/ac/K19_TheDeathslinger_Portrait.png?52fc47" },
-  Animatronic: { display: "Animatronic", spanish: "Animatrónico", aliases: ["Springtrap", "William Afton"], image: "https://deadbydaylight.wiki.gg/images/0/02/K40_TheAnimatronic_Portrait.png?636799" },
-  Demogorgon: { display: "Demogorgon", spanish: "-", aliases: [], image: "https://deadbydaylight.wiki.gg/images/7/75/K17_TheDemogorgon_Portrait.png?20c7d0" },
-  Dredge: { display: "Dredge", spanish: "Draga", aliases: [], image: "https://deadbydaylight.wiki.gg/images/7/7e/K28_TheDredge_Portrait.png?66319e" },
-  Onryo: { display: "Onryō", spanish: "-", aliases: ["Sadako Yamamura"], image: "https://deadbydaylight.wiki.gg/images/5/5f/K27_TheOnryo_Portrait.png?50d2b8" },
-
-  Trickster: { display: "Trickster", spanish: "Embaucador", aliases: ["Ji-Woon Hak"], image: "https://deadbydaylight.wiki.gg/images/c/c9/K23_TheTrickster_Portrait.png?e4204c" },
-  Legion: { display: "Legion", spanish: "Legión", aliases: ["Frank", "Julie", "Susie", "Joey"], image: "https://deadbydaylight.wiki.gg/images/5/53/K14_TheLegion_Portrait.png?f9a179" },
-  Cannibal: { display: "Cannibal", spanish: "Caníbal", aliases: ["Bubba Sawyer", "Leatherface"], image: "https://deadbydaylight.wiki.gg/images/6/6f/K09_TheCannibal_Portrait.png?2b9b38" },
-  Hag: { display: "Hag", spanish: "Bruja", aliases: ["Lisa Sherwood"], image: "https://deadbydaylight.wiki.gg/images/c/c7/K06_TheHag_Portrait.png?60f88f" },
-  Pig: { display: "Pig", spanish: "Cerda", aliases: ["Amanda Young"], image: "https://deadbydaylight.wiki.gg/images/5/5c/K11_ThePig_Portrait.png?893de3" },
-  GhostFace: { display: "Ghost Face", spanish: "-", aliases: ["Danny Johnson"], image: "https://deadbydaylight.wiki.gg/images/d/d1/K16_TheGhostFace_Portrait.png?5a4629" },
-  Trapper: { display: "Trapper", spanish: "Trampero", aliases: ["Evan MacMillan"], image: "https://deadbydaylight.wiki.gg/images/8/81/K01_TheTrapper_Portrait.png?564c1d" },
-
-  Nemesis: { display: "Nemesis", spanish: "Némesis", aliases: [], image: "https://deadbydaylight.wiki.gg/images/K24_TheNemesis_Portrait.png?891941" },
-  Shape: { display: "Shape", spanish: "Forma", aliases: ["Michael Myers"], image: "https://deadbydaylight.wiki.gg/images/b/b5/K05_TheShape_Portrait.png?f9bf22" },
-  Knight: { display: "Knight", spanish: "Caballero", aliases: ["Tarhos Kovács"], image: "https://deadbydaylight.wiki.gg/images/6/69/K30_TheKnight_Portrait.png?b89c9d" },
-  SkullMerchant: { display: "Skull Merchant", spanish: "Comerciante de Calaveras", aliases: ["Adriana Imai"], image: "https://deadbydaylight.wiki.gg/images/6/64/K31_TheSkullMerchant_Portrait.png?91edf3" },
+  Nurse: { display: "The Nurse", spanish: "Enfermera", aliases: ["Sally Smithson"], image: "https://deadbydaylight.wiki.gg/images/3/3b/K04_TheNurse_Portrait.png" },
+  Blight: { display: "The Blight", spanish: "Deterioro", aliases: ["Talbot Grimes"], image: "https://deadbydaylight.wiki.gg/images/K21_TheBlight_Portrait.png" },
+  Hillbilly: { display: "The Hillbilly", spanish: "Pueblerino", aliases: ["Max Thompson Jr."], image: "https://deadbydaylight.wiki.gg/images/2/24/K03_TheHillbilly_Portrait.png" },
+  Ghoul: { display: "The Ghoul", spanish: "-", aliases: ["Ken Kaneki", "Rize Kamishiro"], image: "https://deadbydaylight.wiki.gg/images/K39_TheGhoul_Portrait.png" },
+  Krasue: { display: "The Krasue", spanish: "-", aliases: ["Burong Sukapat"], image: "https://deadbydaylight.wiki.gg/images/K41_TheKrasue_Portrait.png" },
+  Singularity: { display: "The Singularity", spanish: "Singularidad", aliases: [], image: "https://deadbydaylight.wiki.gg/images/2/24/K32_TheSingularity_Portrait.png" },
+  Spirit: { display: "The Spirit", spanish: "Espíritu", aliases: ["Rin Yamaoka"], image: "https://deadbydaylight.wiki.gg/images/f/f1/K13_TheSpirit_Portrait.png" },
+  Twins: { display: "The Twins", spanish: "Mellizos", aliases: ["Charlotte & Victor Deshayes"], image: "https://deadbydaylight.wiki.gg/images/1/17/K22_TheTwins_Portrait.png" },
+  DarkLord: { display: "The Dark Lord", spanish: "Señor Oscuro", aliases: ["Drácula"], image: "https://deadbydaylight.wiki.gg/images/K37_TheDarkLord_Portrait.png" },
+  Oni: { display: "The Oni", spanish: "-", aliases: ["Kazan Yamoka"], image: "https://deadbydaylight.wiki.gg/images/8/80/K18_TheOni_Portrait.png" },
+  Huntress: { display: "The Huntress", spanish: "Cazadora", aliases: ["Anna"], image: "https://deadbydaylight.wiki.gg/images/f/f1/K08_TheHuntress_Portrait.png" },
+  Artist: { display: "The Artist", spanish: "Artista", aliases: ["Carmina Mora"], image: "https://deadbydaylight.wiki.gg/images/0/01/K26_TheArtist_Portrait.png" },
+  Mastermind: { display: "The Mastermind", spanish: "Mente Maestra", aliases: ["Albert Wesker"], image: "https://deadbydaylight.wiki.gg/images/e/ec/K29_TheMastermind_Portrait.png" },
+  Cenobite: { display: "The Cenobite", spanish: "Cenobita", aliases: ["Elliot Spencer"], image: "https://deadbydaylight.wiki.gg/images/K25_TheCenobite_Portrait.png" },
+  Plague: { display: "The Plague", spanish: "Plaga", aliases: ["Adiris"], image: "https://deadbydaylight.wiki.gg/images/f/fe/K15_ThePlague_Portrait.png" },
+  Doctor: { display: "The Doctor", spanish: "-", aliases: ["Herman Carter"], image: "https://deadbydaylight.wiki.gg/images/5/58/K07_TheDoctor_Portrait.png" },
+  Clown: { display: "The Clown", spanish: "Payaso", aliases: ["Kenneth Chase"], image: "https://deadbydaylight.wiki.gg/images/d/d1/K12_TheClown_Portrait.png" },
+  Nightmare: { display: "The Nightmare", spanish: "Pesadilla", aliases: ["Freddy Krueger"], image: "https://deadbydaylight.wiki.gg/images/d/d5/K10_TheNightmare_Portrait.png" },
+  Executioner: { display: "The Executioner", spanish: "Ejecutor", aliases: ["Pyramid Head"], image: "https://deadbydaylight.wiki.gg/images/c/c9/K20_TheExecutioner_Portrait.png" },
+  Xenomorph: { display: "The Xenomorph", spanish: "Xenomorfo", aliases: [], image: "https://deadbydaylight.wiki.gg/images/6/64/K33_TheXenomorph_Portrait.png" },
+  Unknown: { display: "The Unknown", spanish: "Desconocido", aliases: [], image: "https://deadbydaylight.wiki.gg/images/5/51/K35_TheUnknown_Portrait.png" },
+  GoodGuy: { display: "The Good Guy", spanish: "Chico Bueno", aliases: ["Chucky"], image: "https://deadbydaylight.wiki.gg/images/8/81/K34_TheGoodGuy_Portrait.png" },
+  Lich: { display: "The Lich", spanish: "Liche", aliases: ["Vecna"], image: "https://deadbydaylight.wiki.gg/images/K36_TheLich_Portrait.png" },
+  Houndmaster: { display: "The Houndmaster", spanish: "Adiestradora Canina", aliases: ["Portia Maye"], image: "https://deadbydaylight.wiki.gg/images/9/96/K38_TheHoundmaster_Portrait.png" },
+  Wraith: { display: "The Wraith", spanish: "Espectro", aliases: ["Phillip Ojomo"], image: "https://deadbydaylight.wiki.gg/images/c/c2/K02_TheWraith_Portrait.png" },
+  Deathslinger: { display: "The Deathslinger", spanish: "Arponero de la Muerte", aliases: ["Caleb Quinn"], image: "https://deadbydaylight.wiki.gg/images/a/ac/K19_TheDeathslinger_Portrait.png" },
+  Animatronic: { display: "Animatronic", spanish: "Animatrónico", aliases: ["Springtrap"], image: "https://deadbydaylight.wiki.gg/images/0/02/K40_TheAnimatronic_Portrait.png" },
+  Demogorgon: { display: "The Demogorgon", spanish: "-", aliases: [], image: "https://deadbydaylight.wiki.gg/images/7/75/K17_TheDemogorgon_Portrait.png" },
+  Dredge: { display: "The Dredge", spanish: "Draga", aliases: [], image: "https://deadbydaylight.wiki.gg/images/7/7e/K28_TheDredge_Portrait.png" },
+  Onryo: { display: "The Onryō", spanish: "-", aliases: ["Sadako Yamamura"], image: "https://deadbydaylight.wiki.gg/images/5/5f/K27_TheOnryo_Portrait.png" },
+  Trickster: { display: "The Trickster", spanish: "Embaucador", aliases: ["Ji-Woon Hak"], image: "https://deadbydaylight.wiki.gg/images/c/c9/K23_TheTrickster_Portrait.png" },
+  Legion: { display: "The Legion", spanish: "Legión", aliases: ["Frank", "Julie", "Susie", "Joey"], image: "https://deadbydaylight.wiki.gg/images/5/53/K14_TheLegion_Portrait.png" },
+  Cannibal: { display: "The Cannibal", spanish: "Caníbal", aliases: ["Leatherface"], image: "https://deadbydaylight.wiki.gg/images/6/6f/K09_TheCannibal_Portrait.png" },
+  Hag: { display: "The Hag", spanish: "Bruja", aliases: ["Lisa Sherwood"], image: "https://deadbydaylight.wiki.gg/images/c/c7/K06_TheHag_Portrait.png" },
+  Pig: { display: "The Pig", spanish: "Cerda", aliases: ["Amanda Young"], image: "https://deadbydaylight.wiki.gg/images/5/5c/K11_ThePig_Portrait.png" },
+  GhostFace: { display: "The GhostFace", spanish: "-", aliases: ["Danny Johnson"], image: "https://deadbydaylight.wiki.gg/images/d/d1/K16_TheGhostFace_Portrait.png" },
+  Trapper: { display: "The Trapper", spanish: "Trampero", aliases: ["Evan MacMillan"], image: "https://deadbydaylight.wiki.gg/images/8/81/K01_TheTrapper_Portrait.png" }
 };
 
 /* =====================
@@ -83,8 +74,7 @@ const lists = {
   tier5: ["Trickster","Legion","Cannibal","Hag","Pig","GhostFace","Trapper"]
 };
 
-const pickRandom = (arr, n) =>
-  [...arr].sort(() => Math.random() - 0.5).slice(0, n);
+const pickRandom = (arr, n) => [...arr].sort(() => Math.random() - 0.5).slice(0, n);
 
 /* =====================
    BOTONES
@@ -92,21 +82,18 @@ const pickRandom = (arr, n) =>
 function createButtons(remaining, action) {
   const rows = [];
   let row = new ActionRowBuilder();
-
-  remaining.forEach((killer, i) => {
+  remaining.forEach((k, i) => {
     row.addComponents(
       new ButtonBuilder()
-        .setCustomId(`${action}:${killer}`)
-        .setLabel(killer)
+        .setCustomId(`${action}:${k}`)
+        .setLabel(k)
         .setStyle(action === "pick" ? ButtonStyle.Success : ButtonStyle.Danger)
     );
-
     if ((i + 1) % 5 === 0) {
       rows.push(row);
       row = new ActionRowBuilder();
     }
   });
-
   if (row.components.length) rows.push(row);
   return rows;
 }
@@ -124,7 +111,6 @@ function buildPickBanEmbed(game, player, action, coin = null) {
       { name: "🩸 Killers restantes", value: game.remaining.join("\n") },
       { name: "🎮 Turno", value: `<@${player}> — **${action.toUpperCase()}**` }
     );
-
   if (coin) embed.setDescription(`🪙 **Lanzamiento de moneda:** ${coin}`);
   return embed;
 }
@@ -143,8 +129,10 @@ const infoKillerCommand = new SlashCommandBuilder()
   .setDescription("Muestra información de un killer")
   .addStringOption(o =>
     o.setName("killer")
-     .setDescription("Clave del killer (ej: Nurse, GhostFace)")
-     .setRequired(true));
+     .setDescription("Selecciona un killer")
+     .setRequired(true)
+     .setAutocomplete(true)
+  );
 
 /* =====================
    REGISTRO
@@ -155,7 +143,7 @@ client.once("ready", async () => {
     Routes.applicationCommands(client.user.id),
     { body: [pickBanCommand.toJSON(), infoKillerCommand.toJSON()] }
   );
-  console.log("🤖 Bot listo (Pick & Ban + Info Killer)");
+  console.log("🤖 Bot listo");
 });
 
 /* =====================
@@ -163,15 +151,29 @@ client.once("ready", async () => {
 ===================== */
 client.on("interactionCreate", async interaction => {
 
+  /* AUTOCOMPLETE */
+  if (interaction.isAutocomplete()) {
+    if (interaction.commandName !== "info-killer") return;
+    const focused = interaction.options.getFocused().toLowerCase();
+    const choices = Object.entries(killersData)
+      .filter(([k, d]) =>
+        k.toLowerCase().includes(focused) ||
+        d.display.toLowerCase().includes(focused) ||
+        d.aliases.some(a => a.toLowerCase().includes(focused))
+      )
+      .slice(0, 25)
+      .map(([k, d]) => ({ name: d.display, value: k }));
+    await interaction.respond(choices);
+    return;
+  }
+
   if (interaction.isChatInputCommand()) {
 
-    /* ----- /info-killer ----- */
+    /* INFO KILLER */
     if (interaction.commandName === "info-killer") {
       const key = interaction.options.getString("killer");
       const killer = killersData[key];
-
-      if (!killer)
-        return interaction.reply({ content: "❌ Killer no encontrado.", ephemeral: true });
+      if (!killer) return interaction.reply({ content: "❌ Killer no encontrado.", ephemeral: true });
 
       const embed = new EmbedBuilder()
         .setTitle(killer.display.toUpperCase())
@@ -185,7 +187,7 @@ client.on("interactionCreate", async interaction => {
       return interaction.reply({ embeds: [embed] });
     }
 
-    /* ----- /pick-and-ban ----- */
+    /* PICK & BAN */
     if (interaction.commandName === "pick-and-ban") {
       const cara = interaction.options.getUser("cara").id;
       const cruz = interaction.options.getUser("cruz").id;
@@ -230,7 +232,7 @@ client.on("interactionCreate", async interaction => {
     }
   }
 
-  /* ----- BOTONES ----- */
+  /* BOTONES */
   if (interaction.isButton()) {
     const [action, killer] = interaction.customId.split(":");
     const game = games.get(interaction.channelId);
@@ -238,7 +240,6 @@ client.on("interactionCreate", async interaction => {
 
     const step = game.order[game.step];
     const player = game.players[step.player - 1];
-
     if (interaction.user.id !== player || action !== step.action) return;
 
     if (action === "pick") {

@@ -178,10 +178,10 @@ client.on("interactionCreate", async interaction => {
       const embed = new EmbedBuilder()
         .setTitle(killer.display.toUpperCase())
         .setColor(0x5865F2)
-        .setImage(killer.image)
+        .setThumbnail(killer.image)
         .addFields(
-          { name: "🌎 Nombre en español", value: killer.spanish || "—" },
-          { name: "🧠 Alias", value: killer.aliases.length ? killer.aliases.join(", ") : "—" }
+          { name: "🌎 Nombre en español", value: killer.spanish || "—", inline: true },
+          { name: "🧠 Alias", value: killer.aliases.length ? killer.aliases.join(", ") : "—", inline: true }
         );
 
       return interaction.reply({ embeds: [embed] });

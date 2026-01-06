@@ -191,24 +191,23 @@ async function generateTierListImage() {
       if (!data) continue;
 
       try {
-       /* 1️⃣ fondo base */
+       /* fondo base */
       ctx.drawImage(portraitBaseBG, x, y, iconSize, iconSize);
       
-      /* 2️⃣ sombra */
-      ctx.drawImage(portraitShadowBG, x, y, iconSize, iconSize);
-      
-      /* 3️⃣ portrait BG (wiki) */
+      /* portrait BG (wiki) */
       ctx.drawImage(portraitBG, x, y, iconSize, iconSize);
       
-      /* 4️⃣ tinte SOLO al portrait BG */
+      /* tinte SOLO al portrait BG */
       ctx.globalCompositeOperation = "multiply";
       ctx.fillStyle = "rgba(120, 10, 15, 0.85)";
       ctx.fillRect(x, y, iconSize, iconSize);
       ctx.globalCompositeOperation = "source-over";
       
-      /* 5️⃣ retrato del killer (sin modificar) */
+      /* retrato del killer (sin modificar) */
       const img = await loadImage(data.image);
       ctx.drawImage(img, x, y, iconSize, iconSize);
+      /* sombra */
+      ctx.drawImage(portraitShadowBG, x, y, iconSize, iconSize);
       ctx.strokeStyle = "#000000";
       ctx.lineWidth = 3;
       ctx.strokeRect(x, y, iconSize, iconSize);
@@ -307,8 +306,6 @@ async function generateInfoKillerImage(killer) {
   /* base */
   ctx.drawImage(portraitBaseBG, x, y, portraitSize, portraitSize);
 
-  /* sombra */
-  ctx.drawImage(portraitShadowBG, x, y, portraitSize, portraitSize);
 
   /* portrait BG */
   ctx.drawImage(portraitBG, x, y, portraitSize, portraitSize);
@@ -322,6 +319,8 @@ async function generateInfoKillerImage(killer) {
   /* killer intacto */
   const img = await loadImage(killer.image);
   ctx.drawImage(img, x, y, portraitSize, portraitSize);
+   /* sombra */
+  ctx.drawImage(portraitShadowBG, x, y, portraitSize, portraitSize);
   const framePadding = 10;
 
   ctx.strokeStyle = "#000000";

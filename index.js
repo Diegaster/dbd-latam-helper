@@ -144,7 +144,7 @@ async function generateTierListImage() {
     { label: "Tier 3", killers: lists.tier3 },
     { label: "Tier 4", killers: lists.tier4 },
     { label: "Tier 5", killers: lists.tier5 },
-    { label: "Deshabilitado", killers: lists.deshabilitado }
+    { label: "Deshab.", killers: lists.deshabilitado }
   ];
 
   const height = tiers.length * rowHeight + padding * 2;

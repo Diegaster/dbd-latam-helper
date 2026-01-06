@@ -193,22 +193,16 @@ async function generateTierListImage() {
         /* =====================
            FONDO DE RETRATO
         ===================== */
-        ctx.drawImage(portraitBG, x, y, iconSize, iconSize);
-
-        
-
-        const img = await loadImage(data.image);
-
-        /* dibuja imagen original */
-        ctx.drawImage(img, x, y, iconSize, iconSize);
-        
-        /* tinte sutil al retrato */
-        ctx.globalCompositeOperation = "source-atop";
-        ctx.fillStyle = "rgba(80, 0, 0, 0.35)"; // rojo oscuro MUY sutil
+       ctx.drawImage(portraitBG, x, y, iconSize, iconSize);
+        ctx.globalCompositeOperation = "multiply";
+        ctx.fillStyle = "rgba(120, 10, 15, 0.85)";
         ctx.fillRect(x, y, iconSize, iconSize);
         ctx.globalCompositeOperation = "source-over";
-
-        x += iconSize + 14;
+        
+        /* 3️⃣ killer encima (sin modificar color) */
+        const img = await loadImage(data.image);
+        ctx.drawImage(img, x, y, iconSize, iconSize);
+              x += iconSize + 14;
       } catch {
         // ignora errores de imagen
       }

@@ -152,9 +152,9 @@ async function generateTierListImage() {
   const ctx = canvas.getContext("2d");
 
   /* Fondo general */
-  ctx.fillStyle = "#565756"; // gris oscuro uniforme
+  ctx.fillStyle = "#780a0f";
   ctx.fillRect(0, 0, width, height);
-
+  
   ctx.font = "bold 30px sans-serif";
   ctx.textBaseline = "middle";
   ctx.fillStyle = "#ffffff";
@@ -172,6 +172,15 @@ async function generateTierListImage() {
   let y = padding;
 
   for (const tier of tiers) {
+    ctx.fillStyle = "#780a0f";
+    ctx.fillRect(0, y - 6, width, rowHeight);
+
+    /* barra de color */
+    ctx.fillStyle = TIER_COLORS[tier.label] || "#ffffff";
+    ctx.fillRect(0, y - 6, 14, rowHeight);
+
+    /* texto del tier */
+    ctx.fillStyle = "#ffffff";
     ctx.fillText(tier.label, 30, y + iconSize / 2);
 
     let x = 200;

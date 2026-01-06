@@ -45,7 +45,9 @@ function createButtons(remaining, action) {
       new ButtonBuilder()
         .setCustomId(`${action}:${killer}`)
         .setLabel(killer)
-        .setStyle(action === "pick" ? ButtonStyle.Success : ButtonStyle.Danger)
+        .setStyle(action === "pick"
+          ? ButtonStyle.Success
+          : ButtonStyle.Danger)
     );
 
     if ((i + 1) % 5 === 0) {
@@ -59,15 +61,36 @@ function createButtons(remaining, action) {
 }
 
 /* =====================
+   MENSAJE DE ESTADO
+===================== */
+function buildStatusMessage(game, currentPlayer, action) {
+  const p1 = game.pick1 ?? "<sin definir>";
+  const p2 = game.pick2 ?? "<sin definir>";
+
+  return (
+    `🟢 **Partida 1**: ${p1}\n` +
+    `🔵 **Partida 2**: ${p2}\n\n` +
+    `🩸 **Killers restantes (${game.remaining.length})**:\n` +
+    game.remaining.map(k => `• ${k}`).join("\n") +
+    `\n\n🎮 Turno de <@${currentPlayer}>\n` +
+    `Acción: **${action.toUpperCase()}**`
+  );
+}
+
+/* =====================
    COMANDO /pool
 ===================== */
 const poolCommand = new SlashCommandBuilder()
   .setName("pool")
-  .setDescription("Genera el pool y comienza el draft")
+  .setDescription("Genera el pool y lanza la moneda")
   .addUserOption(o =>
-    o.setName("player1").setDescription("Jugador 1").setRequired(true))
+    o.setName("cara")
+     .setDescription("Jugador asignado a CARA")
+     .setRequired(true))
   .addUserOption(o =>
-    o.setName("player2").setDescription("Jugador 2").setRequired(true));
+    o.setName("cruz")
+     .setDescription("Jugador asignado a CRUZ")
+     .setRequired(true));
 
 /* =====================
    REGISTRO SLASH
@@ -94,8 +117,8 @@ client.on("interactionCreate", async interaction => {
   if (interaction.isChatInputCommand()) {
     if (interaction.commandName !== "pool") return;
 
-    const p1 = interaction.options.getUser("player1").id;
-    const p2 = interaction.options.getUser("player2").id;
+    const cara = interaction.options.getUser("cara").id;
+    const cruz = interaction.options.getUser("cruz").id;
 
     const pool = [
       ...pickRandom(lists.tier1, 1),
@@ -105,29 +128,38 @@ client.on("interactionCreate", async interaction => {
       ...pickRandom(lists.tier5, 2)
     ];
 
-   const coin = Math.random() < 0.5 ? "CARA" : "CRUZ";
-   const starter = coin === "CARA" ? p1 : p2;
+    const coin = Math.random() < 0.5 ? "CARA" : "CRUZ";
+    const starter = coin === "CARA" ? cara : cruz;
+    const other   = coin === "CARA" ? cruz : cara;
 
     games.set(interaction.channelId, {
-      pool,
       remaining: [...pool],
       pick1: null,
       pick2: null,
       decider: null,
-      phase: "pick1",
-      turn: starter,
-      starter,
-      players: [p1, p2]
+      step: 0,
+      players: [starter, other], // jugador 1 = ganador moneda
+      order: [
+        { action: "ban",  player: 1 },
+        { action: "ban",  player: 2 },
+        { action: "pick", player: 1 },
+        { action: "pick", player: 2 },
+        { action: "ban",  player: 1 },
+        { action: "ban",  player: 2 },
+        { action: "ban",  player: 1 },
+        { action: "ban",  player: 2 }
+      ]
     });
+
+    const game = games.get(interaction.channelId);
+    const firstStep = game.order[0];
 
     await interaction.reply({
       content:
         `🪙 **LANZAMIENTO DE MONEDA**\n` +
         `Resultado: **${coin}**\n\n` +
-        `🎲 **POOL GENERADO**\n` +
-        pool.map(k => `• ${k}`).join("\n") +
-        `\n\n👉 Empieza <@${starter}>`,
-      components: createButtons(pool, "pick")
+        buildStatusMessage(game, starter, firstStep.action),
+      components: createButtons(pool, firstStep.action)
     });
   }
 
@@ -139,59 +171,48 @@ client.on("interactionCreate", async interaction => {
     if (!game)
       return interaction.reply({ content: "❌ No hay partida activa", ephemeral: true });
 
-    if (interaction.user.id !== game.turn)
+    const stepData = game.order[game.step];
+    const expectedAction = stepData.action;
+    const expectedPlayer = game.players[stepData.player - 1];
+
+    if (interaction.user.id !== expectedPlayer)
       return interaction.reply({ content: "⏳ No es tu turno", ephemeral: true });
+
+    if (action !== expectedAction)
+      return interaction.reply({ content: `❌ Ahora toca ${expectedAction.toUpperCase()}`, ephemeral: true });
 
     if (!game.remaining.includes(killer))
       return interaction.reply({ content: "❌ Opción inválida", ephemeral: true });
 
-    /* PICK */
     if (action === "pick") {
-      if (game.phase === "pick1") {
-        game.pick1 = killer;
-        game.phase = "pick2";
-        game.turn = game.players.find(p => p !== game.turn);
-      } else if (game.phase === "pick2") {
-        game.pick2 = killer;
-        game.phase = "ban";
-        game.turn = game.players.find(p => p !== game.starter);
-      } else {
-        return interaction.reply({ content: "❌ No se puede pickear ahora", ephemeral: true });
-      }
-    }
-
-    /* BAN */
-    if (action === "ban") {
-      if (game.phase !== "ban")
-        return interaction.reply({ content: "❌ No se puede banear ahora", ephemeral: true });
-
-      game.turn = game.players.find(p => p !== game.turn);
+      if (!game.pick1) game.pick1 = killer;
+      else game.pick2 = killer;
     }
 
     game.remaining = game.remaining.filter(k => k !== killer);
+    game.step++;
 
     /* FINAL */
-    if (game.phase === "ban" && game.remaining.length === 1) {
+    if (game.remaining.length === 1) {
       game.decider = game.remaining[0];
-      game.phase = "finished";
 
       return interaction.update({
         content:
           `🏁 **RESULTADO FINAL**\n\n` +
-          `🟢 Partida 1: **${game.pick1}**\n` +
-          `🔵 Partida 2: **${game.pick2}**\n` +
-          `🔥 Desempate: **${game.decider}**`,
+          `🟢 **Partida 1**: ${game.pick1}\n` +
+          `🔵 **Partida 2**: ${game.pick2}\n` +
+          `🔥 **Desempate**: ${game.decider}`,
         components: []
       });
     }
 
-    const nextAction = game.phase === "ban" ? "ban" : "pick";
+    /* SIGUIENTE PASO */
+    const nextStep = game.order[game.step];
+    const nextPlayer = game.players[nextStep.player - 1];
 
     await interaction.update({
-      content:
-        `🎮 Turno de <@${game.turn}>\n` +
-        `Fase: **${game.phase.toUpperCase()}**`,
-      components: createButtons(game.remaining, nextAction)
+      content: buildStatusMessage(game, nextPlayer, nextStep.action),
+      components: createButtons(game.remaining, nextStep.action)
     });
   }
 });

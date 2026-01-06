@@ -322,7 +322,9 @@ async function generateInfoKillerImage(killer) {
   /* killer intacto */
   const img = await loadImage(killer.image);
   ctx.drawImage(img, x, y, portraitSize, portraitSize);
-
+  ctx.strokeStyle = "#000000";
+  ctx.lineWidth = 6;
+  ctx.strokeRect(x - 3, y - 3, size + 6, size + 6);
   return canvas.toBuffer("image/png");
 }
 
@@ -368,31 +370,31 @@ client.on("interactionCreate", async interaction => {
       });
     }
     /* INFO KILLER */
-   if (interaction.commandName === "info-killer") {
-    const key = interaction.options.getString("killer");
-    const killer = killersData[key];
-    if (!killer) {
-      return interaction.reply({ content: "❌ Killer no encontrado.", ephemeral: true });
+    if (interaction.commandName === "info-killer") {
+      const key = interaction.options.getString("killer");
+      const killer = killersData[key];
+    
+      if (!killer) {
+        return interaction.reply({
+          content: "❌ Killer no encontrado.",
+          ephemeral: true
+        });
+      }
+    
+      await interaction.deferReply();
+    
+      const buffer = await generateInfoKillerImage(killer);
+    
+      const embed = new EmbedBuilder()
+        .setColor(0x000000)
+        .setImage("attachment://killer.png");
+    
+      return interaction.editReply({
+        embeds: [embed],
+        files: [{ attachment: buffer, name: "killer.png" }]
+      });
     }
-  
-    await interaction.deferReply();
-  
-    const buffer = await generateInfoKillerImage(killer);
-  
-    const embed = new EmbedBuilder()
-      .setTitle(killer.display.toUpperCase())
-      .setColor(0x5865F2)
-      .setImage("attachment://killer.png")
-      .addFields(
-        { name: "🌎 Nombre en español", value: killer.spanish || "—", inline: true },
-        { name: "🧠 Alias", value: killer.aliases.length ? killer.aliases.join(", ") : "—", inline: true }
-      );
-  
-    return interaction.editReply({
-      embeds: [embed],
-      files: [{ attachment: buffer, name: "killer.png" }]
-    });
-  }
+
 
 
     /* PICK & BAN */

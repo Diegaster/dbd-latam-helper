@@ -24,7 +24,6 @@ const games = new Map();
 /* =====================
    KILLERS DATA
 ===================== */
-const DISABLED_KILLERS = ["Shape", "Knight", "SkullMerchant", "Nemesis"];
 const TIER_COLORS = {
   "Tier 1": "#ff4d4d",
   "Tier 2": "#ff944d",
@@ -70,7 +69,11 @@ const killersData = {
   Hag: { display: "The Hag", spanish: "Bruja", aliases: ["Lisa Sherwood"], image: "https://deadbydaylight.wiki.gg/images/c/c7/K06_TheHag_Portrait.png" },
   Pig: { display: "The Pig", spanish: "Cerda", aliases: ["Amanda Young"], image: "https://deadbydaylight.wiki.gg/images/5/5c/K11_ThePig_Portrait.png" },
   GhostFace: { display: "The GhostFace", spanish: "-", aliases: ["Danny Johnson"], image: "https://deadbydaylight.wiki.gg/images/d/d1/K16_TheGhostFace_Portrait.png" },
-  Trapper: { display: "The Trapper", spanish: "Trampero", aliases: ["Evan MacMillan"], image: "https://deadbydaylight.wiki.gg/images/8/81/K01_TheTrapper_Portrait.png" }
+  Trapper: { display: "The Trapper", spanish: "Trampero", aliases: ["Evan MacMillan"], image: "https://deadbydaylight.wiki.gg/images/8/81/K01_TheTrapper_Portrait.png" },
+  Nemesis: { display: "The Nemesis", spanish: "Némesis", aliases: [], image: "https://deadbydaylight.wiki.gg/images/K24_TheNemesis_Portrait.png"},
+  Knight: { display: "The Knight", spanish: "Caballero", aliases: ["Tarhos Kovács"], image: "https://deadbydaylight.wiki.gg/images/6/69/K30_TheKnight_Portrait.png"},
+  SkullMerchant: { display: "The Skull Merchant", spanish: "Comerciante de Calaveras", aliases: ["Adriana Imai"], image: "https://deadbydaylight.wiki.gg/images/6/64/K31_TheSkullMerchant_Portrait.png"},
+  Shape: { display: "The Shape", spanish: "La Forma", aliases: ["Michael Myers"], image: "https://deadbydaylight.wiki.gg/images/b/b5/K05_TheShape_Portrait.png"}
 };
 
 /* =====================
@@ -81,7 +84,8 @@ const lists = {
   tier2: ["Twins","Dark Lord","Oni","Huntress","Artist","Mastermind","Cenobite"],
   tier3: ["Plague","Doctor","Clown","Nightmare","Executioner","Xenomorph","Unknown","Good Guy","Lich","Houndmaster"],
   tier4: ["Wraith","Deathslinger","Animatronic","Demogorgon","Dredge","Onryo"],
-  tier5: ["Trickster","Legion","Cannibal","Hag","Pig","GhostFace","Trapper"]
+  tier5: ["Trickster","Legion","Cannibal","Hag","Pig","GhostFace","Trapper"],
+  deshabilitado:["Shape", "Skull Merchant", "Knight", "Nemesis"]
 };
 
 const pickRandom = (arr, n) => [...arr].sort(() => Math.random() - 0.5).slice(0, n);
@@ -140,13 +144,7 @@ async function generateTierListImage() {
     { label: "Tier 3", killers: lists.tier3 },
     { label: "Tier 4", killers: lists.tier4 },
     { label: "Tier 5", killers: lists.tier5 },
-    {
-      label: "Deshabilitado",
-      killers: DISABLED_KILLERS.map(k =>
-        Object.values(killersData)
-          .find(d => normalizeKillerKey(d.display) === k)?.display.replace("The ", "")
-      ).filter(Boolean)
-    }
+    { label: "Deshabilitado", killers: lists.deshabilitado }
   ];
 
   const height = tiers.length * rowHeight + padding * 2;
@@ -160,39 +158,40 @@ async function generateTierListImage() {
   ctx.font = "bold 30px sans-serif";
   ctx.textBaseline = "middle";
 
+  /* precargar fondo de retratos */
+  const portraitBG = await loadImage("https://deadbydaylight.wiki.gg/images/CharPortrait_roleBG.webp");
+
   let y = padding;
 
   for (const tier of tiers) {
-    /* Fondo de fila */
+    /* filas alternadas */
     ctx.fillStyle = "#2b2d31";
     ctx.fillRect(0, y - 6, width, rowHeight);
 
-    /* Barra de color */
+    /* barra de color */
     ctx.fillStyle = TIER_COLORS[tier.label] || "#ffffff";
     ctx.fillRect(0, y - 6, 14, rowHeight);
 
-    /* Texto del tier */
+    /* texto del tier */
     ctx.fillStyle = "#ffffff";
     ctx.fillText(tier.label, 30, y + iconSize / 2);
 
     let x = 200;
 
-    for (const killerName of tier.killers) {
-      const key = normalizeKillerKey(killerName);
+    for (const killerKey of tier.killers) {
+      const key = normalizeKillerKey(killerKey);
       const data = killersData[key];
       if (!data) continue;
 
       try {
+        /* dibuja fondo de retrato */
+        ctx.drawImage(portraitBG, x, y, iconSize, iconSize);
+        /* luego dibuja la imagen encima */
         const img = await loadImage(data.image);
-
-        /* Marco */
-        ctx.fillStyle = "#000000";
-        ctx.fillRect(x - 2, y - 2, iconSize + 4, iconSize + 4);
-
         ctx.drawImage(img, x, y, iconSize, iconSize);
         x += iconSize + 14;
       } catch {
-        // ignora errores de imagen
+        // ignora errores
       }
     }
 
@@ -201,6 +200,7 @@ async function generateTierListImage() {
 
   return canvas.toBuffer("image/png");
 }
+
 /* =====================
    SLASH COMMANDS
 ===================== */

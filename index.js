@@ -182,24 +182,24 @@ async function generateTierListImage() {
       if (!data) continue;
 
       try {
-        /* fondo base */
-        ctx.drawImage(portraitBaseBG, 0, 0, size, size);
+       /* 1️⃣ fondo base */
+      ctx.drawImage(portraitBaseBG, x, y, iconSize, iconSize);
       
-        /* sombra */
-        ctx.drawImage(portraitShadowBG, 0, 0, size, size);
+      /* 2️⃣ sombra */
+      ctx.drawImage(portraitShadowBG, x, y, iconSize, iconSize);
       
-        /* portrait BG */
-        ctx.drawImage(portraitBG, 0, 0, size, size);
+      /* 3️⃣ portrait BG (wiki) */
+      ctx.drawImage(portraitBG, x, y, iconSize, iconSize);
       
-        /* tinte SOLO al portrait BG */
-        ctx.globalCompositeOperation = "multiply";
-        ctx.fillStyle = "rgba(120, 10, 15, 0.85)";
-        ctx.fillRect(0, 0, size, size);
-        ctx.globalCompositeOperation = "source-over";;
-
-        // 5️⃣ Killer intacto
-        const img = await loadImage(data.image);
-        ctx.drawImage(img, x, y, iconSize, iconSize);
+      /* 4️⃣ tinte SOLO al portrait BG */
+      ctx.globalCompositeOperation = "multiply";
+      ctx.fillStyle = "rgba(120, 10, 15, 0.85)";
+      ctx.fillRect(x, y, iconSize, iconSize);
+      ctx.globalCompositeOperation = "source-over";
+      
+      /* 5️⃣ retrato del killer (sin modificar) */
+      const img = await loadImage(data.image);
+      ctx.drawImage(img, x, y, iconSize, iconSize);
 
         x += iconSize + 14;
       } catch (e) {

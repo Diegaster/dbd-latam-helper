@@ -50,7 +50,7 @@ const killersData = {
   Houndmaster: { display: "The Houndmaster", spanish: "Adiestradora Canina", aliases: ["Portia Maye"], image: "https://deadbydaylight.wiki.gg/images/9/96/K38_TheHoundmaster_Portrait.png" },
   Wraith: { display: "The Wraith", spanish: "Espectro", aliases: ["Phillip Ojomo"], image: "https://deadbydaylight.wiki.gg/images/c/c2/K02_TheWraith_Portrait.png" },
   Deathslinger: { display: "The Deathslinger", spanish: "Arponero de la Muerte", aliases: ["Caleb Quinn"], image: "https://deadbydaylight.wiki.gg/images/a/ac/K19_TheDeathslinger_Portrait.png" },
-  Animatronic: { display: "Animatronic", spanish: "Animatrónico", aliases: ["Springtrap", "William Afton"], image: "https://deadbydaylight.wiki.gg/images/0/02/K40_TheAnimatronic_Portrait.png" },
+  Animatronic: { display: "The Animatronic", spanish: "Animatrónico", aliases: ["Springtrap", "William Afton"], image: "https://deadbydaylight.wiki.gg/images/0/02/K40_TheAnimatronic_Portrait.png" },
   Demogorgon: { display: "The Demogorgon", spanish: "-", aliases: [], image: "https://deadbydaylight.wiki.gg/images/7/75/K17_TheDemogorgon_Portrait.png" },
   Dredge: { display: "The Dredge", spanish: "Draga", aliases: [], image: "https://deadbydaylight.wiki.gg/images/7/7e/K28_TheDredge_Portrait.png" },
   Onryo: { display: "The Onryō", spanish: "-", aliases: ["Sadako Yamamura"], image: "https://deadbydaylight.wiki.gg/images/5/5f/K27_TheOnryo_Portrait.png" },

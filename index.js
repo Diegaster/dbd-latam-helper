@@ -667,12 +667,20 @@ client.on("interactionCreate", async interaction => {
     }
 
     const next = game.order[game.step];
-    const nextPlayer = game.players[next.player - 1];
 
+    let turnTarget;
+    
+    if (game.mode === "roles") {
+      turnTarget = game[next.role]; // equipo1 o equipo2
+    } else {
+      turnTarget = game.players[next.player - 1];
+    }
+    
     return interaction.update({
-      embeds: [buildPickBanEmbed(game, nextPlayer, next.action)],
+      embeds: [buildPickBanEmbed(game, turnTarget, next.action)],
       components: createButtons(game.remaining, next.action)
     });
+
   }
 });
 

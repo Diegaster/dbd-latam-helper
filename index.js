@@ -552,7 +552,6 @@ client.on("interactionCreate", async interaction => {
         pick1: null,
         pick2: null,
         desempate: null,
-        horario: null,
       
         remaining: [
           ...pickRandom(lists.tier1, 1),
@@ -577,17 +576,14 @@ client.on("interactionCreate", async interaction => {
       await channel.send({
         content:
           `🛑 **Sala de texto creada**
-          🎮 **Pick & Ban**
+          🎮 **Pick & Ban + Horario**
           
-          👥 **${equipo1.name} vs ${equipo2.name}**
-          
-          🟢 Partida 1: *Por definir*
-          🔵 Partida 2: *Por definir*
-          🔥 Desempate: *Por definir*
-          
-          ⏰ Horario: *Por definir*
-          (Formato: Lun-23-20:00)`
-          });
+          👥 ||<@&${equipo1.id}>|| vs ||<@&${equipo2.id}>||
+          `,
+        allowedMentions: {
+          roles: [equipo1.id, equipo2.id]
+        }
+      });
       const game = games.get(channel.id);
       const firstStep = game.order[0];
       

@@ -505,7 +505,15 @@ client.on("interactionCreate", async interaction => {
         parent: category.id,
         permissionOverwrites: [
           {
+            id: interaction.guild.members.me.id,
+            allow: ["ViewChannel", "SendMessages", "ReadMessageHistory"]
+          },
+          {
             id: interaction.guild.id, // @everyone
+            deny: ["ViewChannel"]
+          },
+          {
+            id: "1451075715511357472",
             deny: ["ViewChannel"]
           },
           {

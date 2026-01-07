@@ -495,7 +495,7 @@ client.on("interactionCreate", async interaction => {
         });
       }
     
-      const channelName = `pb-${equipo1.name}-vs-${equipo2.name}`
+      const channelName = `p&b-horario-${equipo1.name}-vs-${equipo2.name}`
         .toLowerCase()
         .replace(/\s+/g, "-");
     
@@ -527,6 +527,63 @@ client.on("interactionCreate", async interaction => {
         content: `✅ Canal creado: ${channel}`,
         ephemeral: true
       });
+      games.set(channel.id, {
+        equipo1: equipo1.id,
+        equipo2: equipo2.id,
+        staff: STAFF_ROLE_ID,
+      
+        pick1: null,
+        pick2: null,
+        desempate: null,
+        horario: null,
+      
+        remaining: [
+          ...pickRandom(lists.tier1, 1),
+          ...pickRandom(lists.tier2, 2),
+          ...pickRandom(lists.tier3, 2),
+          ...pickRandom(lists.tier4, 2),
+          ...pickRandom(lists.tier5, 2)
+        ],
+      
+        step: 0,
+        order: [
+          { action: "ban", role: "equipo1" },
+          { action: "ban", role: "equipo2" },
+          { action: "pick", role: "equipo1" },
+          { action: "pick", role: "equipo2" },
+          { action: "ban", role: "equipo1" },
+          { action: "ban", role: "equipo2" },
+          { action: "ban", role: "equipo1" },
+          { action: "ban", role: "equipo2" }
+        ]
+      });
+      await channel.send({
+        content:
+          `🛑 **Sala de texto creada**
+          🎮 **Pick & Ban**
+          
+          👥 **${equipo1.name} vs ${equipo2.name}**
+          
+          🟢 Partida 1: *Por definir*
+          🔵 Partida 2: *Por definir*
+          🔥 Desempate: *Por definir*
+          
+          ⏰ Horario: *Por definir*
+          (Formato: Lun-23-20:00)`
+          });
+      const game = games.get(channel.id);
+      const firstStep = game.order[0];
+      
+      await channel.send({
+        embeds: [buildPickBanEmbed(
+          { ...game, remaining: game.remaining },
+          equipo1.id,
+          firstStep.action
+        )],
+        components: createButtons(game.remaining, firstStep.action)
+      });
+
+
     }
 
   }
@@ -539,7 +596,14 @@ client.on("interactionCreate", async interaction => {
 
     const step = game.order[game.step];
     const player = game.players[step.player - 1];
-    if (interaction.user.id !== player || action !== step.action) return;
+    const member = interaction.member;
+
+    const allowedRoleId =
+      step.role === "equipo1"
+        ? game.equipo1
+        : game.equipo2;
+    
+    if (!member.roles.cache.has(allowedRoleId)) return;
 
     if (action === "pick") {
       if (!game.pick1) game.pick1 = killer;

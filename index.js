@@ -578,7 +578,7 @@ client.on("interactionCreate", async interaction => {
           `🛑 **Sala de texto creada**
           🎮 **Pick & Ban + Horario**
           
-          👥 ||<@&${equipo1.id}>|| vs ||<@&${equipo2.id}>||
+          👥 <@&${equipo1.id}> vs <@&${equipo2.id}>
           `,
         allowedMentions: {
           roles: [equipo1.id, equipo2.id]

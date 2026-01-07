@@ -120,7 +120,12 @@ function normalizeKillerKey(name) {
 /* =====================
    EMBED PICK & BAN
 ===================== */
-function buildPickBanEmbed(game, player, action, coin = null) {
+function buildPickBanEmbed(game, turnTarget, action, coin = null) {
+  const mention =
+    game.mode === "roles"
+      ? `<@&${turnTarget}>`
+      : `<@${turnTarget}>`;
+
   const embed = new EmbedBuilder()
     .setTitle("🎮 Pick & Ban")
     .setColor(action === "pick" ? 0x57F287 : 0xED4245)
@@ -128,11 +133,13 @@ function buildPickBanEmbed(game, player, action, coin = null) {
       { name: "🟢 Partida 1", value: game.pick1 ?? "*Sin definir*", inline: true },
       { name: "🔵 Partida 2", value: game.pick2 ?? "*Sin definir*", inline: true },
       { name: "🩸 Killers restantes", value: game.remaining.join("\n") },
-      { name: "🎮 Turno", value: `<@${player}> — **${action.toUpperCase()}**` }
+      { name: "🎮 Turno", value: `${mention} — **${action.toUpperCase()}**` }
     );
+
   if (coin) embed.setDescription(`🪙 **Lanzamiento de moneda:** ${coin}`);
   return embed;
 }
+
 async function generateTierListImage(selectedTier = "full") {
   const iconSize = 120;
   const padding = 16;
@@ -456,6 +463,7 @@ client.on("interactionCreate", async interaction => {
       const other = starter === cara ? cruz : cara;
 
       games.set(interaction.channelId, {
+        mode: "users",
         remaining: [...pool],
         pick1: null,
         pick2: null,
@@ -536,6 +544,7 @@ client.on("interactionCreate", async interaction => {
         ephemeral: true
       });
       games.set(channel.id, {
+        mode: "roles",
         equipo1: equipo1.id,
         equipo2: equipo2.id,
         staff: STAFF_ROLE_ID,
@@ -584,9 +593,9 @@ client.on("interactionCreate", async interaction => {
       
       await channel.send({
         embeds: [buildPickBanEmbed(
-          { ...game, remaining: game.remaining },
-          equipo1.id,
-          firstStep.action
+                  game,
+                  game[firstStep.role], // equipo1 o equipo2
+                  firstStep.action
         )],
         components: createButtons(game.remaining, firstStep.action)
       });
@@ -603,15 +612,35 @@ client.on("interactionCreate", async interaction => {
     if (!game) return;
 
     const step = game.order[game.step];
-    const player = game.players[step.player - 1];
     const member = interaction.member;
-
-    const allowedRoleId =
-      step.role === "equipo1"
-        ? game.equipo1
-        : game.equipo2;
     
-    if (!member.roles.cache.has(allowedRoleId)) return;
+    /* ===== MODO ROLES (match) ===== */
+    if (game.mode === "roles") {
+      const allowedRoleId =
+        step.role === "equipo1"
+          ? game.equipo1
+          : game.equipo2;
+    
+      if (!member.roles.cache.has(allowedRoleId)) {
+        return interaction.reply({
+          content: "⛔ No es el turno de tu equipo.",
+          flags: 64
+        });
+      }
+    }
+    
+    /* ===== MODO USUARIOS (pick-and-ban clásico) ===== */
+    if (game.mode === "users") {
+      const playerId = game.players[step.player - 1];
+    
+      if (interaction.user.id !== playerId) {
+        return interaction.reply({
+          content: "⛔ No es tu turno.",
+          flags: 64
+        });
+      }
+    }
+
 
     if (action === "pick") {
       if (!game.pick1) game.pick1 = killer;

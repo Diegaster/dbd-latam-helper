@@ -492,7 +492,9 @@ client.on("interactionCreate", async interaction => {
     if (interaction.commandName === "match") {
       const equipo1 = interaction.options.getRole("equipo1");
       const equipo2 = interaction.options.getRole("equipo2");
-    
+      const coin = Math.random() < 0.5 ? "CARA" : "CRUZ";
+      const starterRole = coin === "CARA" ? equipo1 : equipo2;
+      const otherRole   = coin === "CARA" ? equipo2 : equipo1;
       const STAFF_ROLE_ID = "1451359299392508128";
     
       const category = interaction.channel.parent;
@@ -538,7 +540,11 @@ client.on("interactionCreate", async interaction => {
           }
         ]
       });
-    
+      await channel.send({
+        content:
+          `🪙 **Lanzamiento de moneda:** ${coin}\n` +
+          `🎮 **Empieza:** <@&${starterRole.id}>`
+      });
       await interaction.reply({
         content: `✅ Canal creado: ${channel}`,
         ephemeral: true
@@ -563,14 +569,14 @@ client.on("interactionCreate", async interaction => {
       
         step: 0,
         order: [
-          { action: "ban", role: "equipo1" },
-          { action: "ban", role: "equipo2" },
-          { action: "pick", role: "equipo1" },
-          { action: "pick", role: "equipo2" },
-          { action: "ban", role: "equipo1" },
-          { action: "ban", role: "equipo2" },
-          { action: "ban", role: "equipo1" },
-          { action: "ban", role: "equipo2" }
+          { action: "ban", role: starterRole.id },
+          { action: "ban", role: otherRole.id },
+          { action: "pick", role: starterRole.id },
+          { action: "pick", role: otherRole.id },
+          { action: "ban", role: starterRole.id },
+          { action: "ban", role: otherRole.id },
+          { action: "ban", role: starterRole.id },
+          { action: "ban", role: otherRole.id }
         ]
       });
       await channel.send({
@@ -589,9 +595,9 @@ client.on("interactionCreate", async interaction => {
       
       await channel.send({
         embeds: [buildPickBanEmbed(
-                  game,
-                  game[firstStep.role], // equipo1 o equipo2
-                  firstStep.action
+          game,
+          firstStep.role,
+          firstStep.action
         )],
         components: createButtons(game.remaining, firstStep.action)
       });
@@ -612,12 +618,7 @@ client.on("interactionCreate", async interaction => {
     
     /* ===== MODO ROLES (match) ===== */
     if (game.mode === "roles") {
-      const allowedRoleId =
-        step.role === "equipo1"
-          ? game.equipo1
-          : game.equipo2;
-    
-      if (!member.roles.cache.has(allowedRoleId)) {
+      if (!member.roles.cache.has(step.role)) {
         return interaction.reply({
           content: "⛔ No es el turno de tu equipo.",
           flags: 64
@@ -667,7 +668,7 @@ client.on("interactionCreate", async interaction => {
     let turnTarget;
     
     if (game.mode === "roles") {
-      turnTarget = game[next.role]; // equipo1 o equipo2
+      turnTarget = next.role; // equipo1 o equipo2
     } else {
       turnTarget = game.players[next.player - 1];
     }

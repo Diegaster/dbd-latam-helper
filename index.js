@@ -88,11 +88,11 @@ const games = new Map();
    KILLERS DATA
 ===================== */
 const TIER_COLORS = {
-  "Tier 1": "#ff4d4d",
-  "Tier 2": "#ff944d",
-  "Tier 3": "#ffd24d",
-  "Tier 4": "#4dd2ff",
-  "Tier 5": "#4dff88",
+  "TIER 1": "#ff4d4d",
+  "TIER 2": "#ff944d",
+  "TIER 3": "#ffd24d",
+  "TIER 4": "#4dd2ff",
+  "TIER 5": "#4dff88",
   "Deshabilitado": "#666666"
 };
 const killersData = {

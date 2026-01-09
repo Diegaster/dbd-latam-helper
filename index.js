@@ -79,6 +79,20 @@ const client = new Client({
   intents: [GatewayIntentBits.Guilds]
 });
 
+const fs = require("fs");
+const LEADERBOARD_FILE = "./leaderboard.json";
+
+function loadLeaderboard() {
+  if (!fs.existsSync(LEADERBOARD_FILE)) return {};
+  return JSON.parse(fs.readFileSync(LEADERBOARD_FILE, "utf8"));
+}
+
+function saveLeaderboard(data) {
+  fs.writeFileSync(
+    LEADERBOARD_FILE,
+    JSON.stringify(data, null, 2)
+  );
+}
 /* =====================
    ESTADO DEL JUEGO
 ===================== */
@@ -387,6 +401,11 @@ const setHorarioCommand = new SlashCommandBuilder()
       .setDescription("Hora en formato 24hrs (Ej: 20:00)")
       .setRequired(true)
   );
+
+const leaderboardCommand = new SlashCommandBuilder()
+  .setName("leaderboard")
+  .setDescription("Muestra la tabla de posiciones del torneo");
+
 /* =====================
    REGISTRO
 ===================== */
@@ -394,7 +413,7 @@ client.once("ready", async () => {
   const rest = new REST({ version: "10" }).setToken(process.env.TOKEN);
   await rest.put(
     Routes.applicationCommands(client.user.id),
-    { body: [pickBanCommand.toJSON(), infoKillerCommand.toJSON(), tierListCommand.toJSON(), matchCommand.toJSON(), ] }
+    { body: [pickBanCommand.toJSON(), infoKillerCommand.toJSON(), tierListCommand.toJSON(), matchCommand.toJSON(), leaderboardCommand.toJSON(), setHorarioCommand.toJSON()] }
   );
   console.log("🤖 Bot listo");
 });
@@ -768,6 +787,30 @@ client.on("interactionCreate", async interaction => {
           { name: "📅 Día", value: `${dia} ${numero}`, inline: true },
           { name: "🕒 Hora", value: hora, inline: true }
         );
+    
+      return interaction.reply({ embeds: [embed] });
+    }
+    if (interaction.commandName === "leaderboard") {
+      const leaderboard = loadLeaderboard();
+    
+      if (!Object.keys(leaderboard).length) {
+        return interaction.reply({
+          content: "📊 El leaderboard está vacío.",
+          ephemeral: true
+        });
+      }
+    
+      const sorted = Object.values(leaderboard)
+        .sort((a, b) => b.points - a.points);
+    
+      const lines = sorted.map((team, i) =>
+        `**${i + 1}. ${team.name}** — ${team.points} pts`
+      );
+    
+      const embed = new EmbedBuilder()
+        .setTitle("🏆 Leaderboard – Liga DBD LATAM")
+        .setColor(0xFEE75C)
+        .setDescription(lines.join("\n"));
     
       return interaction.reply({ embeds: [embed] });
     }

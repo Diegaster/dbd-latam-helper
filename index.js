@@ -367,7 +367,22 @@ async function generateInfoKillerImage(killer) {
   ===================== */
   ctx.fillStyle = "#ffffff";
   ctx.font = "bold 32px sans-serif";
+  ctx.font = "bold 34px sans-serif";
+  ctx.fillStyle = "#ff2b2b";
+  
+  /* Glow */
+  ctx.shadowColor = "#ff0000";
+  ctx.shadowBlur = 18;
+  ctx.shadowOffsetX = 0;
+  ctx.shadowOffsetY = 0;
+  
+  /* Texto */
   ctx.fillText(killer.display.toUpperCase(), 32, 48);
+  
+  /* Reset sombras (MUY IMPORTANTE) */
+  ctx.shadowColor = "transparent";
+  ctx.shadowBlur = 0;
+
 
   ctx.font = "20px sans-serif";
   ctx.fillText("- Nombre en español:", 32, 96);

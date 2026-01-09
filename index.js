@@ -10,6 +10,27 @@ const {
   Routes,
   EmbedBuilder
 } = require("discord.js");
+
+function wrapText(ctx, text, x, y, maxWidth, lineHeight) {
+  const words = text.split(" ");
+  let line = "";
+
+  for (let n = 0; n < words.length; n++) {
+    const testLine = line + words[n] + " ";
+    const metrics = ctx.measureText(testLine);
+    const testWidth = metrics.width;
+
+    if (testWidth > maxWidth && n > 0) {
+      ctx.fillText(line, x, y);
+      line = words[n] + " ";
+      y += lineHeight;
+    } else {
+      line = testLine;
+    }
+  }
+  ctx.fillText(line, x, y);
+}
+
 const { createCanvas, loadImage } = require("canvas");
 
 const client = new Client({
@@ -343,7 +364,15 @@ async function generateInfoKillerImage(killer) {
     32,
     196
   );
+  ctx.fillText("- Mapas:", 32, 232);
 
+  const mapsText =
+    killer.maps && killer.maps.length
+      ? killer.maps.join(", ")
+      : "—";
+  
+  /* Texto multilínea automático */
+  wrapText(ctx, mapsText, 32, 260, 460, 22);
   /* =====================
      RETRATO (DERECHA)
   ===================== */
@@ -453,14 +482,7 @@ client.on("interactionCreate", async interaction => {
     
       const embed = new EmbedBuilder()
         .setColor(0x000000)
-        .setImage("attachment://killer.png")
-        .addFields({
-          name: "- Mapas:",
-          value: killer.maps?.length
-            ? killer.maps.join(", ")
-            : "—",
-          inline: false
-        });
+        .setImage("attachment://killer.png");
     
       return interaction.editReply({
         embeds: [embed],

@@ -31,6 +31,28 @@ function wrapText(ctx, text, x, y, maxWidth, lineHeight) {
   ctx.fillText(line, x, y);
 }
 
+function drawGlowText(ctx, text, x, y, {
+  size = 20,
+  color = "#ff2b2b",
+  glow = 12,
+  bold = true,
+  font = "sans-serif"
+} = {}) {
+  ctx.font = `${bold ? "bold" : ""} ${size}px ${font}`;
+  ctx.fillStyle = color;
+
+  ctx.shadowColor = color;
+  ctx.shadowBlur = glow;
+  ctx.shadowOffsetX = 0;
+  ctx.shadowOffsetY = 0;
+
+  ctx.fillText(text, x, y);
+
+  // Reset (MUY IMPORTANTE)
+  ctx.shadowColor = "transparent";
+  ctx.shadowBlur = 0;
+}
+
 const { createCanvas, loadImage } = require("canvas");
 
 const client = new Client({
@@ -384,17 +406,26 @@ async function generateInfoKillerImage(killer) {
   ctx.shadowBlur = 0;
 
 
-  ctx.font = "20px sans-serif";
-  ctx.fillText("- Nombre en español:", 32, 96);
+  drawGlowText(ctx, "Nombre en español:", 32, 96, {
+    size: 20,
+    glow: 10
+  });
   ctx.fillText(killer.spanish || "—", 32, 124);
 
-  ctx.fillText("- Alias(es):", 32, 168);
+  drawGlowText(ctx, "Alias(es):", 32, 168, {
+    size: 20,
+    glow: 10
+  });
   ctx.fillText(
     killer.aliases.length ? killer.aliases.join(", ") : "—",
     32,
     196
   );
-  ctx.fillText("- Mapas:", 32, 232);
+  drawGlowText(ctx, "Mapas:", 32, 232, {
+    size: 20,
+    glow: 10
+  });
+  
 
   const mapsText =
     killer.maps && killer.maps.length

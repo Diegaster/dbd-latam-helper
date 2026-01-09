@@ -285,6 +285,24 @@ const matchCommand = new SlashCommandBuilder()
      .setRequired(true)
   );
 
+const setHorarioCommand = new SlashCommandBuilder()
+  .setName("set-horario")
+  .setDescription("Define el horario del match (solo Staff)")
+  .addStringOption(o =>
+    o.setName("dia")
+      .setDescription("Día (Ej: Lun, Mar, Mié)")
+      .setRequired(true)
+  )
+  .addIntegerOption(o =>
+    o.setName("numero")
+      .setDescription("Número de día")
+      .setRequired(true)
+  )
+  .addStringOption(o =>
+    o.setName("hora")
+      .setDescription("Hora en formato 24hrs (Ej: 20:00)")
+      .setRequired(true)
+  );
 /* =====================
    REGISTRO
 ===================== */
@@ -292,7 +310,7 @@ client.once("ready", async () => {
   const rest = new REST({ version: "10" }).setToken(process.env.TOKEN);
   await rest.put(
     Routes.applicationCommands(client.user.id),
-    { body: [pickBanCommand.toJSON(), infoKillerCommand.toJSON(), tierListCommand.toJSON(), matchCommand.toJSON()] }
+    { body: [pickBanCommand.toJSON(), infoKillerCommand.toJSON(), tierListCommand.toJSON(), matchCommand.toJSON(), ] }
   );
   console.log("🤖 Bot listo");
 });
@@ -601,10 +619,32 @@ client.on("interactionCreate", async interaction => {
         )],
         components: createButtons(game.remaining, firstStep.action)
       });
-
-
     }
-
+    if (interaction.commandName === "set-horario") {
+      const STAFF_ROLE_ID = "1451359299392508128";
+    
+      if (!interaction.member.roles.cache.has(STAFF_ROLE_ID)) {
+        return interaction.reply({
+          content: "⛔ Solo el Staff puede usar este comando.",
+          flags: 64
+        });
+      }
+    
+      const dia = interaction.options.getString("dia");
+      const numero = interaction.options.getInteger("numero");
+      const hora = interaction.options.getString("hora");
+      game.horario = `${dia}-${numero}-${hora}`;
+    
+      const embed = new EmbedBuilder()
+        .setTitle("⏰ Horario definido")
+        .setColor(0x57F287)
+        .addFields(
+          { name: "📅 Día", value: `${dia} ${numero}`, inline: true },
+          { name: "🕒 Hora", value: hora, inline: true }
+        );
+    
+      return interaction.reply({ embeds: [embed] });
+    }
   }
 
   /* BOTONES */

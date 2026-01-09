@@ -53,6 +53,26 @@ function drawGlowText(ctx, text, x, y, {
   ctx.shadowBlur = 0;
 }
 
+function drawTierText(ctx, text, x, y, color) {
+  ctx.font = "bold 30px sans-serif";
+
+  // Glow
+  ctx.shadowColor = color;
+  ctx.shadowBlur = 12;
+
+  // Stroke
+  ctx.lineWidth = 3;
+  ctx.strokeStyle = "#000000";
+  ctx.strokeText(text, x, y);
+
+  // Fill
+  ctx.fillStyle = color;
+  ctx.fillText(text, x, y);
+
+  // Reset
+  ctx.shadowBlur = 0;
+}
+
 const { createCanvas, loadImage } = require("canvas");
 
 const client = new Client({
@@ -95,7 +115,7 @@ const killersData = {
   Clown: { display: "The Clown", spanish: "El Payaso", aliases: ["Kenneth Chase", "Jeffrey Hawk"], maps: ["Wrecker's Yard"], image: "https://deadbydaylight.wiki.gg/images/d/d1/K12_TheClown_Portrait.png" },
   Nightmare: { display: "The Nightmare", spanish: "La Pesadilla", aliases: ["Freddy Krueger"], maps: ["Dead Dawg Saloon"], image: "https://deadbydaylight.wiki.gg/images/d/d5/K10_TheNightmare_Portrait.png" },
   Executioner: { display: "The Executioner", spanish: "El Ejecutor", aliases: ["Pyramid Head"], maps: ["Wrecker's Yard"], image: "https://deadbydaylight.wiki.gg/images/c/c9/K20_TheExecutioner_Portrait.png" },
-  Xenomorph: { display: "The Xenomorph", spanish: "El Xenomorfo", aliases: [], maps: ["Wretched Shop"], image: "https://deadbydaylight.wiki.gg/images/6/64/K33_TheXenomorph_Portrait.png" },
+  Xenomorph: { display: "The Xenomorph", spanish: "El Xenomorfo", aliases: ["Alien"], maps: ["Wretched Shop"], image: "https://deadbydaylight.wiki.gg/images/6/64/K33_TheXenomorph_Portrait.png" },
   Unknown: { display: "The Unknown", spanish: "Lo Desconocido", aliases: [], maps: ["Wrecker's Yard"], image: "https://deadbydaylight.wiki.gg/images/5/51/K35_TheUnknown_Portrait.png" },
   GoodGuy: { display: "The Good Guy", spanish: "El Chico Bueno", aliases: ["Chucky", "Charles Lee Ray"], maps: ["Wrecker's Yard"], image: "https://deadbydaylight.wiki.gg/images/8/81/K34_TheGoodGuy_Portrait.png" },
   Lich: { display: "The Lich", spanish: "El Liche", aliases: ["Vecna"], maps: ["Dead Dawg Saloon"], image: "https://deadbydaylight.wiki.gg/images/K36_TheLich_Portrait.png" },
@@ -250,7 +270,13 @@ async function generateTierListImage(selectedTier = "full") {
 
     /* texto del tier */
     ctx.fillStyle = "#ffffff";
-    ctx.fillText(tier.label, 30, y + iconSize / 2);
+    drawTierText(
+      ctx,
+      tier.label,
+      30,
+      y + iconSize / 2,
+      TIER_COLORS[tier.label] || "#ffffff"
+    );
 
     let x = 200;
 

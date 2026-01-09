@@ -272,7 +272,7 @@ async function generateTierListImage(selectedTier = "full") {
     ctx.fillStyle = "#ffffff";
     drawTierText(
       ctx,
-      tier.label,
+      tier.label.toUpperCase(),
       30,
       y + iconSize / 2,
       TIER_COLORS[tier.label] || "#ffffff"

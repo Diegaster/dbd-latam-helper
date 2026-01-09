@@ -225,12 +225,12 @@ async function generateTierListImage(selectedTier = "full") {
   const width = 1500;
 
   const ALL_TIERS = [
-    { label: "Tier 1", key: "tier1", killers: lists.tier1 },
-    { label: "Tier 2", key: "tier2", killers: lists.tier2 },
-    { label: "Tier 3", key: "tier3", killers: lists.tier3 },
-    { label: "Tier 4", key: "tier4", killers: lists.tier4 },
-    { label: "Tier 5", key: "tier5", killers: lists.tier5 },
-    { label: "Deshab.", key: "deshabilitado", killers: lists.deshabilitado }
+    { label: "TIER 1", key: "tier1", killers: lists.tier1 },
+    { label: "TIER 2", key: "tier2", killers: lists.tier2 },
+    { label: "TIER 3", key: "tier3", killers: lists.tier3 },
+    { label: "TIER 4", key: "tier4", killers: lists.tier4 },
+    { label: "TIER 5", key: "tier5", killers: lists.tier5 },
+    { label: "DESHAB.", key: "deshabilitado", killers: lists.deshabilitado }
   ];
   const tiers = selectedTier === "full"
     ? ALL_TIERS

@@ -115,24 +115,39 @@ const pickRandom = (arr, n) => [...arr].sort(() => Math.random() - 0.5).slice(0,
 /* =====================
    BOTONES
 ===================== */
-function createButtons(remaining, action) {
+function createButtons(killersState, action) {
+  const available = killersState.filter(k => k.status === "available");
   const rows = [];
   let row = new ActionRowBuilder();
-  remaining.forEach((k, i) => {
+
+  available.forEach((k, i) => {
     row.addComponents(
       new ButtonBuilder()
-        .setCustomId(`${action}:${k}`)
-        .setLabel(k)
+        .setCustomId(`${action}:${k.name}`)
+        .setLabel(k.name)
         .setStyle(action === "pick" ? ButtonStyle.Success : ButtonStyle.Danger)
     );
+
     if ((i + 1) % 5 === 0) {
       rows.push(row);
       row = new ActionRowBuilder();
     }
   });
+
   if (row.components.length) rows.push(row);
   return rows;
 }
+
+function renderKillers(killersState) {
+  return killersState
+    .map(k => {
+      if (k.status === "banned") return `❌ ${k.name}`;
+      if (k.status === "picked") return `✅ ${k.name}`;
+      return k.name;
+    })
+    .join("\n");
+}
+
 function normalizeKillerKey(name) {
   return name
     .replace(/\s/g, "")
@@ -153,7 +168,7 @@ function buildPickBanEmbed(game, turnTarget, action, coin = null) {
     .addFields(
       { name: "🟢 Partida 1", value: game.pick1 ?? "*Sin definir*", inline: true },
       { name: "🔵 Partida 2", value: game.pick2 ?? "*Sin definir*", inline: true },
-      { name: "🩸 Killers restantes", value: game.remaining.join("\n") },
+      { name: "🩸 Killers", value: renderKillers(game.killersState) },
       { name: "🎮 Turno", value: `${mention} — **${action.toUpperCase()}**` }
     );
 
@@ -358,7 +373,7 @@ async function generateInfoKillerImage(killer) {
   ctx.fillText("- Nombre en español:", 32, 96);
   ctx.fillText(killer.spanish || "—", 32, 124);
 
-  ctx.fillText("- Alias:", 32, 168);
+  ctx.fillText("- Alias(es):", 32, 168);
   ctx.fillText(
     killer.aliases.length ? killer.aliases.join(", ") : "—",
     32,
@@ -496,7 +511,7 @@ client.on("interactionCreate", async interaction => {
     if (interaction.commandName === "pick-and-ban") {
       const cara = interaction.options.getUser("cara").id;
       const cruz = interaction.options.getUser("cruz").id;
-
+    
       const pool = [
         ...pickRandom(lists.tier1, 1),
         ...pickRandom(lists.tier2, 2),
@@ -504,18 +519,20 @@ client.on("interactionCreate", async interaction => {
         ...pickRandom(lists.tier4, 2),
         ...pickRandom(lists.tier5, 2)
       ];
-
+    
       const coin = Math.random() < 0.5 ? "CARA" : "CRUZ";
       const starter = coin === "CARA" ? cara : cruz;
-      const other = starter === cara ? cruz : cara;
-
+    
       games.set(interaction.channelId, {
         mode: "users",
-        remaining: [...pool],
+        killersState: pool.map(k => ({
+          name: k,
+          status: "available"
+        })),
         pick1: null,
         pick2: null,
         step: 0,
-        players: [starter, other],
+        players: [starter, starter === cara ? cruz : cara],
         order: [
           { action: "ban", player: 1 },
           { action: "ban", player: 2 },
@@ -527,15 +544,16 @@ client.on("interactionCreate", async interaction => {
           { action: "ban", player: 2 }
         ]
       });
-
+    
       const game = games.get(interaction.channelId);
       const step = game.order[0];
-
+    
       return interaction.reply({
         embeds: [buildPickBanEmbed(game, starter, step.action, coin)],
-        components: createButtons(pool, step.action)
+        components: createButtons(game.killersState, step.action)
       });
     }
+
     if (interaction.commandName === "match") {
       const equipo1 = interaction.options.getRole("equipo1");
       const equipo2 = interaction.options.getRole("equipo2");
@@ -601,19 +619,18 @@ client.on("interactionCreate", async interaction => {
         equipo1: equipo1.id,
         equipo2: equipo2.id,
         staff: STAFF_ROLE_ID,
-      
-        pick1: null,
-        pick2: null,
-        desempate: null,
-      
-        remaining: [
+        killersState: [
           ...pickRandom(lists.tier1, 1),
           ...pickRandom(lists.tier2, 2),
           ...pickRandom(lists.tier3, 2),
           ...pickRandom(lists.tier4, 2),
           ...pickRandom(lists.tier5, 2)
-        ],
-      
+        ].map(k => ({
+          name: k,
+          status: "available"
+        })),
+        pick1: null,
+        pick2: null,
         step: 0,
         order: [
           { action: "ban", role: starterRole.id },
@@ -626,6 +643,7 @@ client.on("interactionCreate", async interaction => {
           { action: "ban", role: otherRole.id }
         ]
       });
+
       await channel.send({
         content:
           `🛑 **Sala de texto creada**
@@ -646,7 +664,7 @@ client.on("interactionCreate", async interaction => {
           firstStep.role,
           firstStep.action
         )],
-        components: createButtons(game.remaining, firstStep.action)
+        components: createButtons(game.killersState, firstStep.action)
       });
     }
     if (interaction.commandName === "set-horario") {
@@ -658,7 +676,14 @@ client.on("interactionCreate", async interaction => {
           flags: 64
         });
       }
-    
+      const game = games.get(interaction.channelId);
+
+      if (!game) {
+        return interaction.reply({
+          content: "⛔ Este comando debe usarse dentro de un canal de match.",
+          flags: 64
+        });
+      }
       const dia = interaction.options.getString("dia");
       const numero = interaction.options.getInteger("numero");
       const hora = interaction.options.getString("hora");
@@ -681,24 +706,20 @@ client.on("interactionCreate", async interaction => {
     const [action, killer] = interaction.customId.split(":");
     const game = games.get(interaction.channelId);
     if (!game) return;
-
+  
     const step = game.order[game.step];
     const member = interaction.member;
-    
-    /* ===== MODO ROLES (match) ===== */
-    if (game.mode === "roles") {
-      if (!member.roles.cache.has(step.role)) {
-        return interaction.reply({
-          content: "⛔ No es el turno de tu equipo.",
-          flags: 64
-        });
-      }
+  
+    /* Validación de turno */
+    if (game.mode === "roles" && !member.roles.cache.has(step.role)) {
+      return interaction.reply({
+        content: "⛔ No es el turno de tu equipo.",
+        flags: 64
+      });
     }
-    
-    /* ===== MODO USUARIOS (pick-and-ban clásico) ===== */
+  
     if (game.mode === "users") {
       const playerId = game.players[step.player - 1];
-    
       if (interaction.user.id !== playerId) {
         return interaction.reply({
           content: "⛔ No es tu turno.",
@@ -706,17 +727,35 @@ client.on("interactionCreate", async interaction => {
         });
       }
     }
-
-
+  
+    /* Buscar killer */
+    const target = game.killersState.find(k => k.name === killer);
+    if (!target || target.status !== "available") {
+      return interaction.reply({
+        content: "⛔ Killer ya utilizado.",
+        flags: 64
+      });
+    }
+  
+    /* Aplicar acción */
+    if (action === "ban") {
+      target.status = "banned";
+    }
+  
     if (action === "pick") {
+      target.status = "picked";
       if (!game.pick1) game.pick1 = killer;
       else game.pick2 = killer;
     }
-
-    game.remaining = game.remaining.filter(k => k !== killer);
+  
     game.step++;
-
-    if (game.remaining.length === 1) {
+  
+    /* Comprobar desempate */
+    const disponibles = game.killersState.filter(k => k.status === "available");
+  
+    if (disponibles.length === 1) {
+      disponibles[0].status = "picked";
+  
       return interaction.update({
         embeds: [
           new EmbedBuilder()
@@ -725,29 +764,25 @@ client.on("interactionCreate", async interaction => {
             .addFields(
               { name: "🟢 Partida 1", value: game.pick1, inline: true },
               { name: "🔵 Partida 2", value: game.pick2, inline: true },
-              { name: "🔥 Desempate", value: game.remaining[0] }
+              { name: "🔥 Desempate", value: disponibles[0].name }
             )
         ],
         components: []
       });
     }
-
+  
     const next = game.order[game.step];
-
-    let turnTarget;
-    
-    if (game.mode === "roles") {
-      turnTarget = next.role; // equipo1 o equipo2
-    } else {
-      turnTarget = game.players[next.player - 1];
-    }
-    
+    const nextTarget =
+      game.mode === "roles"
+        ? next.role
+        : game.players[next.player - 1];
+  
     return interaction.update({
-      embeds: [buildPickBanEmbed(game, turnTarget, next.action)],
-      components: createButtons(game.remaining, next.action)
+      embeds: [buildPickBanEmbed(game, nextTarget, next.action)],
+      components: createButtons(game.killersState, next.action)
     });
-
   }
+
 });
 
 client.login(process.env.TOKEN);

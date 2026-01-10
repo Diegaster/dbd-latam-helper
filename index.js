@@ -704,15 +704,10 @@ client.on("interactionCreate", async interaction => {
     
       await interaction.deferReply();
     
-      const buffer = await generateInfoKillerImage(killer);;
-      const embed = new EmbedBuilder()
-        .setColor(0x8b0000)
-        .setImage("attachment://killer.png");
-    
+      const buffer = await generateInfoKillerImage(killer);
       const mapButtons = createMapButtons(killerKey, killer);
     
       return interaction.editReply({
-        embeds: [embed],
         files: [{ attachment: buffer, name: "killer.png" }],
         components: mapButtons
       });
@@ -1043,10 +1038,8 @@ client.on("interactionCreate", async interaction => {
           .setStyle(ButtonStyle.Success)
       );
       return interaction.update({
-        embeds: [
-          interaction.message.embeds[0], // killer canvas
-          mapEmbed
-        ],
+        files: [],
+        embeds: [mapEmbed],
         components: [controls]
       });
     }
@@ -1061,7 +1054,7 @@ client.on("interactionCreate", async interaction => {
   
       const mapButtons = createMapButtons(killerKey, killer);
       return interaction.update({
-        embeds: [interaction.message.embeds[0]],
+        files: [],
         components: mapButtons
       });
     }

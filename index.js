@@ -1006,18 +1006,18 @@ client.on("interactionCreate", async interaction => {
     if (parts[0] === "map") {
       const killerKey = parts[1];
       const mapKey = parts[2];
-    
       const map = MAPS_DATA[mapKey];
       if (!map) return;
+  
+      await interaction.deferUpdate();
     
       const embed = new EmbedBuilder()
         .setTitle(`${map.realm} - ${map.name}`)
         .setColor(0x8b0000)
         .setImage(map.image);
-    
+
       return interaction.followUp({
-        embeds: [embed],
-        ephemeral: false
+        embeds: [embed]
       });
     }
   
@@ -1032,7 +1032,7 @@ client.on("interactionCreate", async interaction => {
       const originalEmbed = new EmbedBuilder()
         .setColor(0x000000)
         .setImage("attachment://killer.png")
-        .setFooter({ text: `killer:${killerKey}` });
+        .setFooter({ text: `Killer: The ${killerKey}` });
     
       const mapButtons = createMapButtons(killerKey, killer.maps);
     

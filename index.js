@@ -154,6 +154,68 @@ const killersData = {
   First: { display: "The First", spanish: "El Primero", aliases: ["Vecna", "Henry Creel", "Uno"], maps: [], image: "https://deadbydaylight.wiki.gg/images/K42_TheFirst_Portrait.png?90c96a"}
 };
 
+const MAPS_DATA = {
+  coal_tower: {
+    key: "coal_tower_1",
+    realm: "The MacMillan Estate",
+    name: "Coal Tower 1",
+    image: "https://deadbydaylight.wiki.gg/images/thumb/IconMap_Ind_CoalTower.png/320px-IconMap_Ind_CoalTower.png?52447f"
+  },
+  blood_lodge: {
+    key: "blood_lodge",
+    realm: "Autohaven Wreckers",
+    name: "Blood Lodge",
+    image: "https://deadbydaylight.wiki.gg/images/thumb/IconMap_Jnk_Lodge.png/320px-IconMap_Jnk_Lodge.png?56a299"
+  },
+  suffocation_pit: {
+    key: "suffocation_pit_1",
+    name: "Suffocation Pit 1",
+    image: "https://example.com/suffocation_pit.jpg"
+  },
+  wrecker_yard: {
+    key: "wrecker_yard",
+    realm: "Autohaven Wreckers",
+    name: "Wrecker's Yard",
+    image: "https://deadbydaylight.wiki.gg/images/thumb/IconMap_Jnk_Scrapyard.png/320px-IconMap_Jnk_Scrapyard.png?405905"
+  },
+  wretched_shop: {
+    key: "wretched_shop",
+    realm: "Autohaven Wreckers",
+    name: "Wretched Shop",
+    image: "https://deadbydaylight.wiki.gg/images/thumb/IconMap_Jnk_Garage.png/320px-IconMap_Jnk_Garage.png?838630"
+  },
+  dead_dawg_saloon: {
+    key: "dead_dawg_saloon",
+    realm: "Grave of Glenvale",
+    name: "Dead Dawg Saloon",
+    image: "https://deadbydaylight.wiki.gg/images/thumb/IconMap_Ukr_Saloon.png/320px-IconMap_Ukr_Saloon.png?85f881"
+  },
+  midwich: {
+    key: "midwich",
+    realm: "Silent Hill",
+    name: "Midwich Elementary School",
+    image: "https://deadbydaylight.wiki.gg/images/thumb/IconMap_Wal_Level01.png/320px-IconMap_Wal_Level01.png?bf4eec"
+  },
+  lerys: {
+    key: "lerys",
+    realm: "Léry's Memorial Institute",
+    name: "Treatment Theatre",
+    image: "https://deadbydaylight.wiki.gg/images/thumb/IconMap_Hos_Treatment.png/320px-IconMap_Hos_Treatment.png?3f0e48"
+  },
+  grim_pantry: {
+    key: "grim_pantry",
+    realm: "Backwater Swamp",
+    name: "Grim Pantry",
+    image: "https://deadbydaylight.wiki.gg/images/thumb/IconMap_Swp_GrimPantry.png/320px-IconMap_Swp_GrimPantry.png?f474d9"
+  },
+  underground_complex: {
+    key: "underground_complex",
+    realm: "Hawkins National Laboratory",
+    name: "The Underground Complex",
+    image: "https://deadbydaylight.wiki.gg/images/thumb/IconMap_Qat_Laboratory.png/320px-IconMap_Qat_Laboratory.png?ee4b93"
+  }
+};
+
 /* =====================
    LISTAS PICK & BAN
 ===================== */
@@ -208,6 +270,35 @@ function normalizeKillerKey(name) {
   return name
     .replace(/\s/g, "")
     .replace("ō", "o");
+}
+
+function normalizeMapKey(name) {
+  return name
+    .toLowerCase()
+    .replace(/'/g, "")
+    .replace(/[^a-z0-9]+/g, "_")
+    .replace(/_1$/, "")
+    .replace(/_+$/, "");
+}
+
+function createMapButtons(killerKey, maps) {
+  if (!maps || !maps.length) return [];
+
+  const row = new ActionRowBuilder();
+
+  maps.forEach(mapName => {
+    const mapKey = normalizeMapKey(mapName);
+    if (!MAPS_DATA[mapKey]) return;
+
+    row.addComponents(
+      new ButtonBuilder()
+        .setCustomId(`map:${killerKey}:${mapKey}`)
+        .setLabel(`🗺 ${MAPS_DATA[mapKey].name}`)
+        .setStyle(ButtonStyle.Secondary)
+    );
+  });
+
+  return row.components.length ? [row] : [];
 }
 /* =====================
    EMBED PICK & BAN
@@ -597,8 +688,8 @@ client.on("interactionCreate", async interaction => {
 
     /* INFO KILLER */
     if (interaction.commandName === "info-killer") {
-      const key = interaction.options.getString("killer");
-      const killer = killersData[key];
+      const killerKey = interaction.options.getString("killer");
+      const killer = killersData[killerKey];
     
       if (!killer) {
         return interaction.reply({
@@ -615,11 +706,15 @@ client.on("interactionCreate", async interaction => {
         .setColor(0x000000)
         .setImage("attachment://killer.png");
     
+      const mapButtons = createMapButtons(killerKey, killer.maps);
+    
       return interaction.editReply({
         embeds: [embed],
-        files: [{ attachment: buffer, name: "killer.png" }]
+        files: [{ attachment: buffer, name: "killer.png" }],
+        components: mapButtons
       });
     }
+
 
 
 
@@ -905,6 +1000,63 @@ client.on("interactionCreate", async interaction => {
 
   /* BOTONES */
   if (interaction.isButton()) {
+    const parts = interaction.customId.split(":");
+
+      /* ===== MAP PREVIEW ===== */
+      if (parts[0] === "map") {
+        const killerKey = parts[1];
+        const mapKey = parts[2];
+    
+        const killer = killersData[killerKey];
+        const map = MAPS_DATA[mapKey];
+    
+        if (!killer || !map) {
+          return interaction.reply({
+            content: "❌ Mapa no encontrado.",
+            flags: 64
+          });
+        }
+    
+        const embed = new EmbedBuilder()
+          .setTitle(`${map.realm} - ${map.name}`)
+          .setColor(0x8b0000)
+          .setImage(map.image);
+    
+        const row = new ActionRowBuilder().addComponents(
+          new ButtonBuilder()
+            .setCustomId(`back:${killerKey}`)
+            .setLabel("⬅ Volver al Killer")
+            .setStyle(ButtonStyle.Primary)
+        );
+    
+        return interaction.update({
+          embeds: [embed],
+          components: [row]
+        });
+      }
+    
+      /* ===== BACK TO KILLER ===== */
+      if (parts[0] === "back") {
+        const killerKey = parts[1];
+        const killer = killersData[killerKey];
+    
+        if (!killer) return;
+    
+        const buffer = await generateInfoKillerImage(killer);
+    
+        const embed = new EmbedBuilder()
+          .setColor(0x000000)
+          .setImage("attachment://killer.png");
+    
+        const mapButtons = createMapButtons(killerKey, killer.maps);
+    
+        return interaction.update({
+          embeds: [embed],
+          files: [{ attachment: buffer, name: "killer.png" }],
+          components: mapButtons
+        });
+      }
+    }
     const [action, killer] = interaction.customId.split(":");
     const game = games.get(interaction.channelId);
     if (!game) return;

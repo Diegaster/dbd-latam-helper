@@ -704,9 +704,7 @@ client.on("interactionCreate", async interaction => {
     
       await interaction.deferReply();
     
-      const buffer = await generateInfoKillerImage(killer);
-      const killerImages = new Map();
-      killerImages.set(interaction.message.id, buffer);
+      const buffer = await generateInfoKillerImage(killer);;
       const embed = new EmbedBuilder()
         .setColor(0x8b0000)
         .setImage("attachment://killer.png");
@@ -1044,13 +1042,11 @@ client.on("interactionCreate", async interaction => {
           .setLabel("🔁 Siguiente mapa")
           .setStyle(ButtonStyle.Success)
       );
-      const buffer = killerImages.get(interaction.message.id);
       return interaction.update({
         embeds: [
           interaction.message.embeds[0], // killer canvas
           mapEmbed
         ],
-        files: [{ attachment: buffer, name: "killer.png" }],
         components: [controls]
       });
     }
@@ -1064,10 +1060,8 @@ client.on("interactionCreate", async interaction => {
       if (!killer) return;
   
       const mapButtons = createMapButtons(killerKey, killer);
-      const buffer = killerImages.get(interaction.message.id);
       return interaction.update({
         embeds: [interaction.message.embeds[0]],
-        files: [{ attachment: buffer, name: "killer.png" }],
         components: mapButtons
       });
     }

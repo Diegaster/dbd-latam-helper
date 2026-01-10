@@ -796,7 +796,7 @@ client.on("interactionCreate", async interaction => {
         parent: category.id,
         permissionOverwrites: [
           {
-            id: interaction.guild.members.me.id,
+            id: client.user.id,
             allow: ["ViewChannel", "SendMessages", "ReadMessageHistory"]
           },
           {

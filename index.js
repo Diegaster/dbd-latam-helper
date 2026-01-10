@@ -404,20 +404,31 @@ const setHorarioCommand = new SlashCommandBuilder()
 
 const leaderboardCommand = new SlashCommandBuilder()
   .setName("leaderboard")
-  .setDescription("Muestra la tabla de posiciones del torneo");
-
-const leaderboardUpdateCommand = new SlashCommandBuilder()
-  .setName("leaderboard-update")
-  .setDescription("Suma puntos a un equipo en el leaderboard")
-  .addRoleOption(o =>
-    o.setName("team")
-      .setDescription("Equipo (rol)")
-      .setRequired(true)
+  .setDescription("Gestión de la leaderboard del torneo")
+  .addSubcommand(sub =>
+    sub
+      .setName("show")
+      .setDescription("Muestra la tabla de posiciones")
   )
-  .addIntegerOption(o =>
-    o.setName("points")
-      .setDescription("Puntos a sumar (0 para crear equipo)")
-      .setRequired(true)
+  .addSubcommand(sub =>
+    sub
+      .setName("update")
+      .setDescription("Actualiza puntos de un equipo")
+      .addRoleOption(o =>
+        o.setName("equipo")
+          .setDescription("Rol del equipo")
+          .setRequired(true)
+      )
+      .addIntegerOption(o =>
+        o.setName("puntos")
+          .setDescription("Puntos a sumar (0 para agregar equipo)")
+          .setRequired(true)
+      )
+  )
+  .addSubcommand(sub =>
+    sub
+      .setName("reset")
+      .setDescription("Reinicia la leaderboard (solo Staff)")
   );
 
 /* =====================
@@ -427,7 +438,7 @@ client.once("ready", async () => {
   const rest = new REST({ version: "10" }).setToken(process.env.TOKEN);
   await rest.put(
     Routes.applicationCommands(client.user.id),
-    { body: [pickBanCommand.toJSON(), infoKillerCommand.toJSON(), tierListCommand.toJSON(), matchCommand.toJSON(), leaderboardCommand.toJSON(), setHorarioCommand.toJSON(), leaderboardUpdateCommand.toJSON()] }
+    { body: [pickBanCommand.toJSON(), infoKillerCommand.toJSON(), tierListCommand.toJSON(), matchCommand.toJSON(), leaderboardCommand.toJSON(), setHorarioCommand.toJSON()] }
   );
   console.log("🤖 Bot listo");
 });
@@ -805,58 +816,89 @@ client.on("interactionCreate", async interaction => {
       return interaction.reply({ embeds: [embed] });
     }
     if (interaction.commandName === "leaderboard") {
-      const leaderboard = loadLeaderboard();
-    
-      if (!Object.keys(leaderboard).length) {
-        return interaction.reply({
-          content: "📊 El leaderboard está vacío.",
-          ephemeral: true
-        });
-      }
-    
-      const sorted = Object.values(leaderboard)
-        .sort((a, b) => b.points - a.points);
-    
-      const lines = sorted.map((team, i) =>
-        `**${i + 1}. ${team.name}** — ${team.points} pts`
-      );
-    
-      const embed = new EmbedBuilder()
-        .setTitle("🏆 Leaderboard – Liga DBD LATAM")
-        .setColor(0xFEE75C)
-        .setDescription(lines.join("\n"));
-    
-      return interaction.reply({ embeds: [embed] });
-    }
-    if (interaction.commandName === "leaderboard-update") {
+      const sub = interaction.options.getSubcommand();
       const STAFF_ROLE_ID = "1451359299392508128";
+      const leaderboard = loadLeaderboard();
     
-      if (!interaction.member.roles.cache.has(STAFF_ROLE_ID)) {
+      /* =====================
+         SHOW
+      ===================== */
+      if (sub === "show") {
+        const entries = Object.values(leaderboard);
+    
+        if (!entries.length) {
+          return interaction.reply({
+            content: "📭 La leaderboard aún está vacía.",
+            ephemeral: true
+          });
+        }
+    
+        entries.sort((a, b) => b.points - a.points);
+    
+        const ranking = entries.map((team, i) => {
+          const medal =
+            i === 0 ? "🥇" :
+            i === 1 ? "🥈" :
+            i === 2 ? "🥉" :
+            `#${i + 1}`;
+    
+          return `${medal} **${team.name}** — **${team.points} pts**`;
+        }).join("\n");
+    
+        const embed = new EmbedBuilder()
+          .setTitle("🏆 Leaderboard del Torneo")
+          .setColor(0xF1C40F)
+          .setDescription(ranking)
+          .setFooter({ text: "Formato liga • DBD LATAM" });
+    
+        return interaction.reply({ embeds: [embed] });
+      }
+    
+      /* =====================
+         UPDATE
+      ===================== */
+      if (sub === "update") {
+        if (!interaction.member.roles.cache.has(STAFF_ROLE_ID)) {
+          return interaction.reply({
+            content: "⛔ Solo el Staff puede actualizar la leaderboard.",
+            ephemeral: true
+          });
+        }
+    
+        const role = interaction.options.getRole("equipo");
+        const points = interaction.options.getInteger("puntos");
+    
+        if (!leaderboard[role.id]) {
+          leaderboard[role.id] = {
+            name: role.name,
+            points: 0
+          };
+        }
+    
+        leaderboard[role.id].points += points;
+        saveLeaderboard(leaderboard);
+    
         return interaction.reply({
-          content: "⛔ Solo el Staff puede usar este comando.",
-          flags: 64
+          content: `✅ **${role.name}** ahora tiene **${leaderboard[role.id].points} puntos**.`
         });
       }
     
-      const teamRole = interaction.options.getRole("team");
-      const points = interaction.options.getInteger("points");
+      /* =====================
+         RESET
+      ===================== */
+      if (sub === "reset") {
+        if (!interaction.member.roles.cache.has(STAFF_ROLE_ID)) {
+          return interaction.reply({
+            content: "⛔ Solo el Staff puede reiniciar la leaderboard.",
+            ephemeral: true
+          });
+        }
     
-      const leaderboard = loadLeaderboard();
-    
-      if (!leaderboard[teamRole.id]) {
-        leaderboard[teamRole.id] = {
-          name: teamRole.name,
-          points: 0
-        };
+        saveLeaderboard({});
+        return interaction.reply({
+          content: "🧹 Leaderboard reiniciada correctamente."
+        });
       }
-    
-      leaderboard[teamRole.id].points += points;
-    
-      saveLeaderboard(leaderboard);
-    
-      return interaction.reply({
-        content: `✅ **${teamRole.name}** ahora tiene **${leaderboard[teamRole.id].points} pts**`
-      });
     }
 
   }

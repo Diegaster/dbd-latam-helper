@@ -175,6 +175,7 @@ const MAPS_DATA = {
   },
   suffocation_pit_1: {
     key: "suffocation_pit_1",
+    realm: "The MacMillan Estate",
     name: "Suffocation Pit 1",
     image: "https://example.com/suffocation_pit.jpg"
   },
@@ -706,8 +707,7 @@ client.on("interactionCreate", async interaction => {
       const buffer = await generateInfoKillerImage(killer);
     
       const embed = new EmbedBuilder()
-        .setColor(0x000000)
-        .setImage("attachment://killer.png");
+        .setColor(0x8b0000);
     
       const mapButtons = createMapButtons(killerKey, killer);
     

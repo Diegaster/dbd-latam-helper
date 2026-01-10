@@ -1050,7 +1050,8 @@ client.on("interactionCreate", async interaction => {
           interaction.message.embeds[0], // killer canvas
           mapEmbed
         ],
-        components: [controls]
+        components: [controls],
+        files: []
       });
     }
   
@@ -1066,7 +1067,8 @@ client.on("interactionCreate", async interaction => {
   
       return interaction.update({
         embeds: [interaction.message.embeds[0]],
-        components: mapButtons
+        components: mapButtons,
+        files: []
       });
     }
       

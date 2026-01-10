@@ -1007,36 +1007,41 @@ client.on("interactionCreate", async interaction => {
     /* =====================
        MAP SELECCIONADO
     ===================== */
-    if (parts[0] === "map" || parts[0] === "map-random") {
+    if (parts[0] === "map" || parts[0] === "map-next") {
       const killerKey = parts[1];
       const killer = killersData[killerKey];
       if (!killer) return;
-  
+    
       const maps = getMapsForKiller(killer);
       if (!maps.length) return;
-  
-      const map =
-        parts[0] === "map"
-          ? maps.find(m => m.key === parts[2])
-          : maps[Math.floor(Math.random() * maps.length)];
-  
+    
+      let mapIndex;
+    
+      if (parts[0] === "map") {
+        mapIndex = maps.findIndex(m => m.key === parts[2]);
+      } else {
+        mapIndex = (parseInt(parts[2]) + 1) % maps.length;
+      }
+    
+      const map = maps[mapIndex];
       if (!map) return;
-  
+    
       const mapEmbed = new EmbedBuilder()
         .setTitle(`${map.realm} — ${map.name}`)
         .setColor(0x8b0000)
         .setImage(map.image);
-  
+    
       const controls = new ActionRowBuilder().addComponents(
         new ButtonBuilder()
           .setCustomId(`back:${killerKey}`)
-          .setLabel("⬅ Volver al Killer")
+          .setLabel("⬅ Ocultar mapa")
           .setStyle(ButtonStyle.Primary),
         new ButtonBuilder()
-          .setCustomId(`map-random:${killerKey}`)
+          .setCustomId(`map-next:${killerKey}:${mapIndex}`)
           .setLabel("🔁 Siguiente mapa")
           .setStyle(ButtonStyle.Success)
       );
+    
       return interaction.update({
         embeds: [mapEmbed],
         components: [controls]

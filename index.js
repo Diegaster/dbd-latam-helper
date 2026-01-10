@@ -155,7 +155,7 @@ const killersData = {
 };
 
 const MAPS_DATA = {
-  coal_tower: {
+  coal_tower_1: {
     key: "coal_tower_1",
     realm: "The MacMillan Estate",
     name: "Coal Tower 1",
@@ -167,7 +167,7 @@ const MAPS_DATA = {
     name: "Blood Lodge",
     image: "https://deadbydaylight.wiki.gg/images/thumb/IconMap_Jnk_Lodge.png/320px-IconMap_Jnk_Lodge.png?56a299"
   },
-  suffocation_pit: {
+  suffocation_pit_1: {
     key: "suffocation_pit_1",
     name: "Suffocation Pit 1",
     image: "https://example.com/suffocation_pit.jpg"
@@ -1004,32 +1004,32 @@ client.on("interactionCreate", async interaction => {
     /* =====================
        MAP PREVIEW
     ===================== */
-    if (parts[0] === "map") {
-      const killerKey = parts[1];
-      const mapKey = parts[2];
+   if (parts[0] === "map") {
+    const killerKey = parts[1];
+    const mapKey = parts[2];
   
-      const killer = killersData[killerKey];
-      const map = MAPS_DATA[mapKey];
-      if (!killer || !map) return;
+    const killer = killersData[killerKey];
+    const map = MAPS_DATA[mapKey];
+    if (!killer || !map) return;
   
-      const embed = new EmbedBuilder()
-        .setTitle(`${map.realm} - ${map.name}`)
-        .setColor(0x8b0000)
-        .setImage(map.image);
+    const embed = new EmbedBuilder()
+      .setTitle(`${map.realm} — ${map.name}`)
+      .setColor(0x8b0000)
+      .setImage(map.image);
   
-      const row = new ActionRowBuilder().addComponents(
-        new ButtonBuilder()
-          .setCustomId(`back:${killerKey}`)
-          .setLabel("⬅ Volver al Killer")
-          .setStyle(ButtonStyle.Primary)
-      );
+    const row = new ActionRowBuilder().addComponents(
+      new ButtonBuilder()
+        .setCustomId(`back:${killerKey}`)
+        .setLabel("⬅ Volver al Killer")
+        .setStyle(ButtonStyle.Primary)
+    );
   
-      return interaction.update({
-        embeds: [embed],
-        components: [row]
-      });
-    }
-  
+    return interaction.update({
+      embeds: [embed],
+      components: [row]
+    });
+  }
+    
     /* =====================
        BACK TO KILLER
     ===================== */
@@ -1037,24 +1037,22 @@ client.on("interactionCreate", async interaction => {
       const killerKey = parts[1];
       const killer = killersData[killerKey];
       if (!killer) return;
-  
+    
       const buffer = await generateInfoKillerImage(killer);
-  
+    
       const embed = new EmbedBuilder()
         .setColor(0x000000)
         .setImage("attachment://killer.png");
-  
-      const mapButtons = createMapButtons(killerKey, killer.maps);
-  
+    
       return interaction.update({
         embeds: [embed],
         files: [{ attachment: buffer, name: "killer.png" }],
-        components: mapButtons
+        components: createMapButtons(killerKey, killer.maps)
       });
     }
-  
+      
     /* =====================
-       PICK & BAN (NO TOCAR)
+       PICK & BAN
     ===================== */
     const [action, killerName] = parts;
     const game = games.get(interaction.channelId);

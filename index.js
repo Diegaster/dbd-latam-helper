@@ -406,6 +406,20 @@ const leaderboardCommand = new SlashCommandBuilder()
   .setName("leaderboard")
   .setDescription("Muestra la tabla de posiciones del torneo");
 
+const leaderboardUpdateCommand = new SlashCommandBuilder()
+  .setName("leaderboard-update")
+  .setDescription("Suma puntos a un equipo en el leaderboard")
+  .addRoleOption(o =>
+    o.setName("team")
+      .setDescription("Equipo (rol)")
+      .setRequired(true)
+  )
+  .addIntegerOption(o =>
+    o.setName("points")
+      .setDescription("Puntos a sumar (0 para crear equipo)")
+      .setRequired(true)
+  );
+
 /* =====================
    REGISTRO
 ===================== */
@@ -413,7 +427,7 @@ client.once("ready", async () => {
   const rest = new REST({ version: "10" }).setToken(process.env.TOKEN);
   await rest.put(
     Routes.applicationCommands(client.user.id),
-    { body: [pickBanCommand.toJSON(), infoKillerCommand.toJSON(), tierListCommand.toJSON(), matchCommand.toJSON(), leaderboardCommand.toJSON(), setHorarioCommand.toJSON()] }
+    { body: [pickBanCommand.toJSON(), infoKillerCommand.toJSON(), tierListCommand.toJSON(), matchCommand.toJSON(), leaderboardCommand.toJSON(), setHorarioCommand.toJSON(), leaderboardUpdateCommand.toJSON()] }
   );
   console.log("🤖 Bot listo");
 });
@@ -696,11 +710,6 @@ client.on("interactionCreate", async interaction => {
           }
         ]
       });
-      await channel.send({
-        content:
-          `🪙 **Lanzamiento de moneda:** ${coin}\n` +
-          `🎮 **Empieza:** <@&${starterRole.id}>`
-      });
       await interaction.reply({
         content: `✅ Canal creado: ${channel}`,
         ephemeral: true
@@ -745,6 +754,11 @@ client.on("interactionCreate", async interaction => {
         allowedMentions: {
           roles: [equipo1.id, equipo2.id]
         }
+      });
+      await channel.send({
+        content:
+          `🪙 **Lanzamiento de moneda:** ${coin}\n` +
+          `🎮 **Empieza:** <@&${starterRole.id}>`
       });
       const game = games.get(channel.id);
       const firstStep = game.order[0];
@@ -814,6 +828,37 @@ client.on("interactionCreate", async interaction => {
     
       return interaction.reply({ embeds: [embed] });
     }
+    if (interaction.commandName === "leaderboard-update") {
+      const STAFF_ROLE_ID = "1451359299392508128";
+    
+      if (!interaction.member.roles.cache.has(STAFF_ROLE_ID)) {
+        return interaction.reply({
+          content: "⛔ Solo el Staff puede usar este comando.",
+          flags: 64
+        });
+      }
+    
+      const teamRole = interaction.options.getRole("team");
+      const points = interaction.options.getInteger("points");
+    
+      const leaderboard = loadLeaderboard();
+    
+      if (!leaderboard[teamRole.id]) {
+        leaderboard[teamRole.id] = {
+          name: teamRole.name,
+          points: 0
+        };
+      }
+    
+      leaderboard[teamRole.id].points += points;
+    
+      saveLeaderboard(leaderboard);
+    
+      return interaction.reply({
+        content: `✅ **${teamRole.name}** ahora tiene **${leaderboard[teamRole.id].points} pts**`
+      });
+    }
+
   }
 
   /* BOTONES */

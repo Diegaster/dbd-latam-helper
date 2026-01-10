@@ -1038,7 +1038,6 @@ client.on("interactionCreate", async interaction => {
           .setStyle(ButtonStyle.Success)
       );
       return interaction.update({
-        files: [],
         embeds: [mapEmbed],
         components: [controls]
       });
@@ -1054,7 +1053,7 @@ client.on("interactionCreate", async interaction => {
   
       const mapButtons = createMapButtons(killerKey, killer);
       return interaction.update({
-        files: [],
+        embeds: [],
         components: mapButtons
       });
     }

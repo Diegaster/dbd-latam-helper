@@ -708,7 +708,6 @@ client.on("interactionCreate", async interaction => {
     
       const embed = new EmbedBuilder()
         .setColor(0x8b0000)
-        .setTitle("INFO KILLER")
         .setImage("attachment://killer.png");
     
       const mapButtons = createMapButtons(killerKey, killer);

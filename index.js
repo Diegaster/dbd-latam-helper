@@ -1066,7 +1066,7 @@ client.on("interactionCreate", async interaction => {
         embeds: [interaction.message.embeds[0]],
         components: mapButtons
       });
-    }}
+    }
       
     /* =====================
        PICK & BAN

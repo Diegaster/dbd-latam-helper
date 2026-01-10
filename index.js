@@ -1008,7 +1008,6 @@ client.on("interactionCreate", async interaction => {
       /* =====================
          MAP PREVIEW
       ===================== */
-     const parts = interaction.customId.split(":");
   
     /* =====================
        MAP SELECCIONADO

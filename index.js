@@ -177,7 +177,7 @@ const MAPS_DATA = {
     key: "suffocation_pit_1",
     realm: "The MacMillan Estate",
     name: "Suffocation Pit 1",
-    image: "https://example.com/suffocation_pit.jpg"
+    image: "https://deadbydaylight.wiki.gg/images/thumb/IconMap_Ind_Mine.png/320px-IconMap_Ind_Mine.png?97408e"
   },
   wrecker_yard: {
     key: "wrecker_yard",
@@ -709,6 +709,7 @@ client.on("interactionCreate", async interaction => {
       const embed = new EmbedBuilder()
         .setColor(0x8b0000)
         .setTitle("INFO KILLER");
+        .setImage("attachment://killer.png");
     
       const mapButtons = createMapButtons(killerKey, killer);
     

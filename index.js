@@ -703,8 +703,7 @@ client.on("interactionCreate", async interaction => {
     
       const embed = new EmbedBuilder()
         .setColor(0x000000)
-        .setImage("attachment://killer.png")
-        .setFooter({ text: `killer:${killerKey}` });
+        .setImage("attachment://killer.png");
     
       const mapButtons = createMapButtons(killerKey, killer.maps);
     
@@ -1002,49 +1001,62 @@ client.on("interactionCreate", async interaction => {
   if (interaction.isButton()) {
     const parts = interaction.customId.split(":");
   
-    /* ===== MAP PREVIEW ===== */
+    /* =====================
+       MAP PREVIEW
+    ===================== */
     if (parts[0] === "map") {
       const killerKey = parts[1];
       const mapKey = parts[2];
-      const map = MAPS_DATA[mapKey];
-      if (!map) return;
   
-      await interaction.deferUpdate();
-    
+      const killer = killersData[killerKey];
+      const map = MAPS_DATA[mapKey];
+      if (!killer || !map) return;
+  
       const embed = new EmbedBuilder()
         .setTitle(`${map.realm} - ${map.name}`)
         .setColor(0x8b0000)
         .setImage(map.image);
-
-      return interaction.followUp({
-        embeds: [embed]
+  
+      const row = new ActionRowBuilder().addComponents(
+        new ButtonBuilder()
+          .setCustomId(`back:${killerKey}`)
+          .setLabel("⬅ Volver al Killer")
+          .setStyle(ButtonStyle.Primary)
+      );
+  
+      return interaction.update({
+        embeds: [embed],
+        components: [row]
       });
     }
   
-    /* ===== BACK TO KILLER ===== */
+    /* =====================
+       BACK TO KILLER
+    ===================== */
     if (parts[0] === "back") {
       const killerKey = parts[1];
       const killer = killersData[killerKey];
       if (!killer) return;
-    
+  
       const buffer = await generateInfoKillerImage(killer);
-    
-      const originalEmbed = new EmbedBuilder()
+  
+      const embed = new EmbedBuilder()
         .setColor(0x000000)
-        .setImage("attachment://killer.png")
-        .setFooter({ text: `Killer: The ${killerKey}` });
-    
+        .setImage("attachment://killer.png");
+  
       const mapButtons = createMapButtons(killerKey, killer.maps);
-    
+  
       return interaction.update({
-        embeds: [originalEmbed],
+        embeds: [embed],
         files: [{ attachment: buffer, name: "killer.png" }],
         components: mapButtons
       });
     }
-    if (parts[0] !== "ban" && parts[0] !== "pick") return;
-    /* ===== PICK & BAN BUTTONS ===== */
-    const [action, killer] = interaction.customId.split(":");
+  
+    /* =====================
+       PICK & BAN (NO TOCAR)
+    ===================== */
+    const [action, killerName] = parts;
     const game = games.get(interaction.channelId);
     if (!game) return;
   
@@ -1068,7 +1080,7 @@ client.on("interactionCreate", async interaction => {
       }
     }
   
-    const target = game.killersState.find(k => k.name === killer);
+    const target = game.killersState.find(k => k.name === killerName);
     if (!target || target.status !== "available") {
       return interaction.reply({
         content: "⛔ Killer ya utilizado.",
@@ -1079,8 +1091,8 @@ client.on("interactionCreate", async interaction => {
     if (action === "ban") target.status = "banned";
     if (action === "pick") {
       target.status = "picked";
-      if (!game.pick1) game.pick1 = killer;
-      else game.pick2 = killer;
+      if (!game.pick1) game.pick1 = killerName;
+      else game.pick2 = killerName;
     }
   
     game.step++;
@@ -1116,6 +1128,7 @@ client.on("interactionCreate", async interaction => {
       components: createButtons(game.killersState, next.action)
     });
   }
+  
 
 
 });

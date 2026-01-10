@@ -53,6 +53,12 @@ function drawGlowText(ctx, text, x, y, {
   ctx.shadowBlur = 0;
 }
 
+function getMapsForKiller(killer) {
+  return killer.maps
+    .map(name => Object.values(MAPS_DATA).find(m => m.name === name))
+    .filter(Boolean);
+}
+
 function drawTierText(ctx, text, x, y, color) {
   ctx.font = "bold 30px sans-serif";
 
@@ -280,24 +286,22 @@ function normalizeMapKey(name) {
     .replace(/_+$/, "");
 }
 
-function createMapButtons(killerKey, maps) {
-  if (!maps || !maps.length) return [];
+function createMapButtons(killerKey, killer) {
+  const maps = getMapsForKiller(killer);
+  if (!maps.length) return [];
 
   const row = new ActionRowBuilder();
 
-  maps.forEach(mapName => {
-    const mapKey = normalizeMapKey(mapName);
-    if (!MAPS_DATA[mapKey]) return;
-
+  maps.forEach(map => {
     row.addComponents(
       new ButtonBuilder()
-        .setCustomId(`map:${killerKey}:${mapKey}`)
-        .setLabel(`🗺 ${MAPS_DATA[mapKey].name}`)
+        .setCustomId(`map:${killerKey}:${map.key}`)
+        .setLabel(`🗺 ${map.name}`)
         .setStyle(ButtonStyle.Secondary)
     );
   });
 
-  return row.components.length ? [row] : [];
+  return [row];
 }
 /* =====================
    EMBED PICK & BAN
@@ -705,7 +709,7 @@ client.on("interactionCreate", async interaction => {
         .setColor(0x000000)
         .setImage("attachment://killer.png");
     
-      const mapButtons = createMapButtons(killerKey, killer.maps);
+      const mapButtons = createMapButtons(killerKey, killer);
     
       return interaction.editReply({
         embeds: [embed],
@@ -1001,35 +1005,54 @@ client.on("interactionCreate", async interaction => {
   if (interaction.isButton()) {
     const parts = interaction.customId.split(":");
   
+      /* =====================
+         MAP PREVIEW
+      ===================== */
+     const parts = interaction.customId.split(":");
+  
     /* =====================
-       MAP PREVIEW
+       MAP SELECCIONADO
     ===================== */
-   if (parts[0] === "map") {
-    const killerKey = parts[1];
-    const mapKey = parts[2];
+    if (parts[0] === "map" || parts[0] === "map-random") {
+      const killerKey = parts[1];
+      const killer = killersData[killerKey];
+      if (!killer) return;
   
-    const killer = killersData[killerKey];
-    const map = MAPS_DATA[mapKey];
-    if (!killer || !map) return;
+      const maps = getMapsForKiller(killer);
+      if (!maps.length) return;
   
-    const embed = new EmbedBuilder()
-      .setTitle(`${map.realm} — ${map.name}`)
-      .setColor(0x8b0000)
-      .setImage(map.image);
+      const map =
+        parts[0] === "map"
+          ? maps.find(m => m.key === parts[2])
+          : maps[Math.floor(Math.random() * maps.length)];
   
-    const row = new ActionRowBuilder().addComponents(
-      new ButtonBuilder()
-        .setCustomId(`back:${killerKey}`)
-        .setLabel("⬅ Volver al Killer")
-        .setStyle(ButtonStyle.Primary)
-    );
+      if (!map) return;
   
-    return interaction.update({
-      embeds: [embed],
-      components: [row]
-    });
-  }
-    
+      const mapEmbed = new EmbedBuilder()
+        .setTitle(`${map.realm} — ${map.name}`)
+        .setColor(0x8b0000)
+        .setImage(map.image);
+  
+      const controls = new ActionRowBuilder().addComponents(
+        new ButtonBuilder()
+          .setCustomId(`back:${killerKey}`)
+          .setLabel("⬅ Volver al Killer")
+          .setStyle(ButtonStyle.Primary),
+        new ButtonBuilder()
+          .setCustomId(`map-random:${killerKey}`)
+          .setLabel("🔁 Siguiente mapa")
+          .setStyle(ButtonStyle.Success)
+      );
+  
+      return interaction.update({
+        embeds: [
+          interaction.message.embeds[0], // killer canvas
+          mapEmbed
+        ],
+        components: [controls]
+      });
+    }
+  
     /* =====================
        BACK TO KILLER
     ===================== */
@@ -1037,19 +1060,14 @@ client.on("interactionCreate", async interaction => {
       const killerKey = parts[1];
       const killer = killersData[killerKey];
       if (!killer) return;
-    
-      const buffer = await generateInfoKillerImage(killer);
-    
-      const embed = new EmbedBuilder()
-        .setColor(0x000000)
-        .setImage("attachment://killer.png");
-    
+  
+      const mapButtons = createMapButtons(killerKey, killer);
+  
       return interaction.update({
-        embeds: [embed],
-        files: [{ attachment: buffer, name: "killer.png" }],
-        components: createMapButtons(killerKey, killer.maps)
+        embeds: [interaction.message.embeds[0]],
+        components: mapButtons
       });
-    }
+    }}
       
     /* =====================
        PICK & BAN

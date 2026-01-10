@@ -1001,62 +1001,63 @@ client.on("interactionCreate", async interaction => {
   /* BOTONES */
   if (interaction.isButton()) {
     const parts = interaction.customId.split(":");
-
-      /* ===== MAP PREVIEW ===== */
-      if (parts[0] === "map") {
-        const killerKey = parts[1];
-        const mapKey = parts[2];
-    
-        const killer = killersData[killerKey];
-        const map = MAPS_DATA[mapKey];
-    
-        if (!killer || !map) {
-          return interaction.reply({
-            content: "❌ Mapa no encontrado.",
-            flags: 64
-          });
-        }
-    
-        const embed = new EmbedBuilder()
-          .setTitle(`${map.realm} - ${map.name}`)
-          .setColor(0x8b0000)
-          .setImage(map.image);
-    
-        const row = new ActionRowBuilder().addComponents(
-          new ButtonBuilder()
-            .setCustomId(`back:${killerKey}`)
-            .setLabel("⬅ Volver al Killer")
-            .setStyle(ButtonStyle.Primary)
-        );
-    
-        return interaction.update({
-          embeds: [embed],
-          components: [row]
+  
+    /* ===== MAP PREVIEW ===== */
+    if (parts[0] === "map") {
+      const killerKey = parts[1];
+      const mapKey = parts[2];
+  
+      const killer = killersData[killerKey];
+      const map = MAPS_DATA[mapKey];
+  
+      if (!killer || !map) {
+        return interaction.reply({
+          content: "❌ Mapa no encontrado.",
+          flags: 64
         });
       }
-    
-      /* ===== BACK TO KILLER ===== */
-      if (parts[0] === "back") {
-        const killerKey = parts[1];
-        const killer = killersData[killerKey];
-    
-        if (!killer) return;
-    
-        const buffer = await generateInfoKillerImage(killer);
-    
-        const embed = new EmbedBuilder()
-          .setColor(0x000000)
-          .setImage("attachment://killer.png");
-    
-        const mapButtons = createMapButtons(killerKey, killer.maps);
-    
-        return interaction.update({
-          embeds: [embed],
-          files: [{ attachment: buffer, name: "killer.png" }],
-          components: mapButtons
-        });
-      }
+  
+      const embed = new EmbedBuilder()
+        .setTitle(`${map.realm} - ${map.name}`)
+        .setColor(0x8b0000)
+        .setImage(map.image);
+  
+      const row = new ActionRowBuilder().addComponents(
+        new ButtonBuilder()
+          .setCustomId(`back:${killerKey}`)
+          .setLabel("⬅ Volver al Killer")
+          .setStyle(ButtonStyle.Primary)
+      );
+  
+      return interaction.update({
+        embeds: [embed],
+        components: [row]
+      });
     }
+  
+    /* ===== BACK TO KILLER ===== */
+    if (parts[0] === "back") {
+      const killerKey = parts[1];
+      const killer = killersData[killerKey];
+  
+      if (!killer) return;
+  
+      const buffer = await generateInfoKillerImage(killer);
+  
+      const embed = new EmbedBuilder()
+        .setColor(0x000000)
+        .setImage("attachment://killer.png");
+  
+      const mapButtons = createMapButtons(killerKey, killer.maps);
+  
+      return interaction.update({
+        embeds: [embed],
+        files: [{ attachment: buffer, name: "killer.png" }],
+        components: mapButtons
+      });
+    }
+  
+    /* ===== PICK & BAN BUTTONS ===== */
     const [action, killer] = interaction.customId.split(":");
     const game = games.get(interaction.channelId);
     if (!game) return;
@@ -1064,7 +1065,6 @@ client.on("interactionCreate", async interaction => {
     const step = game.order[game.step];
     const member = interaction.member;
   
-    /* Validación de turno */
     if (game.mode === "roles" && !member.roles.cache.has(step.role)) {
       return interaction.reply({
         content: "⛔ No es el turno de tu equipo.",
@@ -1082,7 +1082,6 @@ client.on("interactionCreate", async interaction => {
       }
     }
   
-    /* Buscar killer */
     const target = game.killersState.find(k => k.name === killer);
     if (!target || target.status !== "available") {
       return interaction.reply({
@@ -1091,11 +1090,7 @@ client.on("interactionCreate", async interaction => {
       });
     }
   
-    /* Aplicar acción */
-    if (action === "ban") {
-      target.status = "banned";
-    }
-  
+    if (action === "ban") target.status = "banned";
     if (action === "pick") {
       target.status = "picked";
       if (!game.pick1) game.pick1 = killer;
@@ -1104,7 +1099,6 @@ client.on("interactionCreate", async interaction => {
   
     game.step++;
   
-    /* Comprobar desempate */
     const disponibles = game.killersState.filter(k => k.status === "available");
   
     if (disponibles.length === 1) {
@@ -1136,6 +1130,7 @@ client.on("interactionCreate", async interaction => {
       components: createButtons(game.killersState, next.action)
     });
   }
+
 
 });
 
